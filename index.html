@@ -10,7 +10,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%232952CC'/%3E%3Ctext x='32' y='42' font-size='26' text-anchor='middle' fill='white' font-family='sans-serif'%3E%E0%B8%AA%E0%B8%9A%3C/text%3E%3C/svg%3E">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai+Looped:wght@400;500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
 <style>
 :root{
   --bg:#F4F6FA;--surface:#FFFFFF;--surface-2:#F0F2F7;--line:#E2E6EE;--ink:#141B2D;--ink-2:#4A5468;--ink-3:#8590A5;
@@ -241,7 +241,7 @@ pre.msg{white-space:pre-wrap;background:#E7F6E1;color:#13231A;border-radius:16px
 :root{--bg:#EEF2FA;--surface:#FFFFFF;--surface-2:#F2F5FB;--line:#E3E8F2;--ink:#101828;--ink-2:#475467;--ink-3:#8A94A6;
   --accent:#3B5BDB;--accent-2:#7048E8;--accent-soft:#EAEFFF;--radius:18px;
   --shadow:0 1px 2px rgba(16,24,40,.04),0 6px 20px rgba(16,24,40,.06);--shadow-lg:0 18px 40px -18px rgba(37,56,140,.35);
-  --f:"IBM Plex Sans Thai","Noto Sans Thai","Sarabun","Leelawadee UI",Tahoma,sans-serif}
+  --f:"IBM Plex Sans Thai Looped","Sarabun","Leelawadee UI",Tahoma,sans-serif;--mono:"IBM Plex Mono","IBM Plex Sans Thai Looped","Sarabun",Tahoma,monospace}
 @media (prefers-color-scheme:dark){:root{--bg:#0B1020;--surface:#131A2E;--surface-2:#1A2340;--line:#26314F;--ink:#E8ECF7;--ink-2:#AAB4CC;--ink-3:#7C87A3;--accent:#8EA4FF;--accent-soft:#1D2A55}}
 body{background:radial-gradient(1100px 520px at 105% -12%,rgba(112,72,232,.13),transparent 60%),radial-gradient(900px 480px at -12% 112%,rgba(59,91,219,.12),transparent 60%),var(--bg);background-attachment:fixed}
 h1,h2,b,.btn{letter-spacing:-.005em}
@@ -298,6 +298,22 @@ h1,h2,b,.btn{letter-spacing:-.005em}
 /* gate */
 .gate{background:linear-gradient(140deg,#16204A 0%,#2B2470 50%,#5F3DC4 100%)}
 .gcard{border:0;box-shadow:0 30px 60px -20px rgba(0,0,0,.45)}
+.lgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:16px}
+.lstack{display:flex;flex-direction:column;gap:14px}
+.lab{font-size:13px;color:var(--ink-2);font-weight:500;margin-bottom:6px}
+.stepn{width:26px;height:26px;border-radius:50%;display:inline-grid;place-items:center;background:var(--accent-soft);color:var(--accent);font-size:13px;font-weight:700}
+.stepn.ok{background:var(--in-soft);color:var(--ok)}.stepn svg.i{width:15px;height:15px}
+.okline{color:var(--ok);font-size:13.5px;display:flex;gap:6px;align-items:center;margin-bottom:6px}.okline svg.i{width:16px;height:16px}
+.badline{color:var(--crit);font-size:13.5px;display:flex;gap:6px;align-items:center;margin-bottom:6px}
+.lrows{display:flex;flex-direction:column;gap:8px}
+.lrow{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:12px;padding:8px 10px}
+.lrow .x{flex:1;min-width:0}.lrow small{display:block;color:var(--ink-3);font-size:12px;overflow:hidden;text-overflow:ellipsis}
+.note code,.lstack code{font-family:var(--mono);background:var(--surface-2);padding:0 5px;border-radius:5px}
+ol.hist{margin:0;padding-left:20px;font-size:14px;display:flex;flex-direction:column;gap:6px}
+ol.hist li::marker{color:var(--accent)}
+.chip.blue{background:var(--blue-soft);color:var(--blue)}
+a.statlink{text-decoration:none;color:inherit;display:block}a.statlink .panel:hover{border-color:var(--amber)}
+.df .btn{flex:none}
 /* ---------- gate (หน้าใส่รหัส) ---------- */
 .gate{min-height:100vh;display:grid;place-items:center;padding:24px 16px}
 .gcard{width:min(460px,100%);background:var(--surface);border:1px solid var(--line);border-radius:22px;box-shadow:0 10px 40px rgba(20,27,45,.08);overflow:hidden}
@@ -447,6 +463,7 @@ function go(v, opt) {
 document.addEventListener('click', e => {
   if (e.target.closest('[data-logout]')) { e.preventDefault(); logout(); return; }
   if (e.target.closest('[data-reload]')) { e.preventDefault(); if (K) enter(K); return; }
+  if (e.target.closest('[data-pending]')) { e.preventDefault(); S.q = ''; S.st = 'รอดำเนินการ'; S.year = ''; S.dir = ''; go('letters'); return; }
   const n = e.target.closest('[data-nav]'); if (n) { e.preventDefault(); go(n.dataset.nav); return; }
   if (e.target.closest('[data-close]')) { closeDrawer(); return; }
 });
@@ -469,12 +486,14 @@ function hl(t) {
   if (!terms.length) return s; try { return s.replace(new RegExp('(' + terms.join('|') + ')', 'gi'), '<mark>$1</mark>'); } catch (e) { return s; }
 }
 const fileBtns = it => it.files.map((u, i) => `<a class="fbtn" href="${esc(u)}" rel="noopener" onclick="event.stopPropagation()">${ic('clip')} ${it.files.length > 1 ? 'ไฟล์ ' + (i + 1) : 'เปิดหนังสือ'}</a>`).join('');
+const ST_CLS = { 'รอดำเนินการ': 'warn', 'กำลังดำเนินการ': 'blue', 'ส่งต่อแล้ว': 'out', 'เสร็จสิ้น': 'ok' };
+const stChip = s => s ? `<span class="chip ${ST_CLS[s] || ''}">${esc(s)}</span>` : '';
 function letterCard(it, i) {
   const out = it.dir === 'ส่ง';
   const tags = [it.cat && `<span class="chip">${esc(it.cat)}</span>`, it.urg && it.urg !== 'ปกติ' && `<span class="chip warn">${esc(it.urg)}</span>`, it.sec && it.sec !== 'ปกติ' && `<span class="chip crit">${esc(it.sec)}</span>`].filter(Boolean).join('');
   return `<article class="card" data-open data-i="${i}" tabindex="0">
     <div class="ic ${out ? 'out' : 'in'}">${ic(out ? 'send' : 'inbox')}</div>
-    <div class="bd"><div class="top"><span class="chip ${out ? 'out' : 'in'}">${out ? 'ส่ง' : 'รับ'}</span><span class="lbl">${hl(it.label || 'ไม่มีเลข')}</span><span class="dt">${esc(it.dateTH)}</span></div>
+    <div class="bd"><div class="top"><span class="chip ${out ? 'out' : 'in'}">${out ? 'ส่ง' : 'รับ'}</span><span class="lbl">${hl(it.label || 'ไม่มีเลข')}</span>${stChip(it.status)}<span class="dt">${esc(it.dateTH)}</span></div>
     <div class="subj">${hl(it.subject)}</div>
     <div class="meta"><span>ที่ ${hl(it.book || '—')}</span><span>${hl(out ? 'ถึง ' + (it.to || '—') : 'จาก ' + (it.from || '—'))}</span>${it.owner ? `<span>${hl(it.owner)}</span>` : ''}</div>
     ${tags || it.files.length ? `<div class="tags">${tags}${fileBtns(it)}</div>` : ''}</div></article>`;
@@ -490,14 +509,21 @@ function openLetter(it) {
   const row = (k, v) => v ? `<dt>${k}</dt><dd>${esc(v)}</dd>` : '';
   const loc = [it.room, it.cab && 'ตู้ ' + it.cab, it.shelf && 'ชั้น ' + it.shelf, it.folder && 'แฟ้ม ' + it.folder].filter(Boolean).join(' · ');
   const files = it.files.map((u, i) => `<a href="${esc(u)}" rel="noopener"><span class="fi">${ic('file')}</span><b>ไฟล์ที่ ${i + 1}</b><span class="note">เปิดใน Drive</span>${ic('ext')}</a>`).join('');
-  openDrawer(`<span class="chip ${out ? 'out' : 'in'}">${out ? 'หนังสือส่ง' : 'หนังสือรับ'}</span> <span class="mono" style="margin-left:6px">${esc(it.label || '')}</span>`,
+  const hist = String(it.log || '').split('\n').filter(Boolean).reverse();
+  openDrawer(`<span class="chip ${out ? 'out' : 'in'}">${out ? 'หนังสือส่ง' : 'หนังสือรับ'}</span> <span class="mono" style="margin-left:6px">${esc(it.label || '')}</span> ${stChip(it.status)}`,
     `<h2>${esc(it.subject)}</h2>
     <dl>${row('ที่', it.book)}${row('ลงวันที่', it.dateTH)}${row('หนังสือ ลว.', it.dir === 'รับ' ? it.lw : '')}${row('จาก', it.from)}${row('ถึง / เรียน', it.to)}${row('หมวดเรื่อง', it.cat)}${row('ผู้รับผิดชอบ', it.owner)}${row('ผู้ดำเนินการ', it.doer)}${row('วัตถุประสงค์', it.purpose)}${row('สถานที่จัดงาน', it.venue)}${row('วันที่จัด', [it.d1, it.d2 && it.d2 !== it.d1 ? it.d2 : ''].filter(Boolean).join(' – '))}${row('ที่เก็บตัวจริง', loc)}${row('หมายเหตุ', it.note)}</dl>
     ${ADMIN && it.chk ? `<div class="warnbox"><b>ควรตรวจสอบ:</b> ${esc(it.chk)}</div>` : ''}
     <div class="sec"><h3>เอกสารแนบ</h3><div class="att">${files || '<span class="note">ยังไม่มีไฟล์แนบ' + (ADMIN && it.old ? ' · ไฟล์เดิมเคยอยู่ที่ ' + esc(it.old) : '') + '</span>'}</div>
       ${ADMIN ? `<label class="drop" id="upDrop" style="margin-top:10px">${ic('upload')}<span style="flex:1">เลือกไฟล์ / ลากมาวาง เพื่อแนบเพิ่ม</span><input id="upFiles" type="file" multiple accept="application/pdf,image/*,.doc,.docx,.xls,.xlsx" hidden></label>` : (files ? '<p class="note" style="margin:8px 0 0">เปิดไฟล์ไม่ได้? เข้าสู่ระบบ Google ด้วยอีเมลที่ผู้ดูแลเพิ่มให้</p>' : '')}</div>
-    ${ADMIN ? `<p class="note" style="margin:0">แถวที่ ${it.row} ในชีต${S.meta && S.meta.sheetUrl ? ` · <a href="${esc(S.meta.sheetUrl + '&range=A' + it.row)}">เปิดแถวในชีต</a>` : ''}${it.src ? '<br>ที่มา: ' + esc(it.src) : ''}</p>` : ''}`);
+    ${hist.length ? `<div class="sec"><h3>ประวัติการดำเนินการ</h3><ol class="hist">${hist.map(h => `<li>${esc(h)}</li>`).join('')}</ol></div>` : ''}
+    ${ADMIN ? `<p class="note" style="margin:0">แถวที่ ${it.row} ในชีต${S.meta && S.meta.sheetUrl ? ` · <a href="${esc(S.meta.sheetUrl + '&range=A' + it.row)}">เปิดในชีต</a> <span class="note">(ต้องล็อกอิน Google บัญชีเจ้าของ)</span>` : ''}${it.src ? '<br>ที่มา: ' + esc(it.src) : ''}</p>` : ''}`, ADMIN ? `<button class="btn" id="ltEdit">${ic('edit')} แก้ไข</button><button class="btn" id="ltFwd">${ic('send')} ส่งต่อ</button>${it.status === 'เสร็จสิ้น' ? `<button class="btn" id="ltReopen">เปิดเรื่องอีกครั้ง</button>` : `<button class="btn primary" id="ltDone">${ic('check')} เสร็จสิ้น</button>`}` : '');
   if (!ADMIN) return;
+  $('#ltEdit').onclick = () => editLetter(it);
+  $('#ltFwd').onclick = () => forwardLetter(it);
+  const setSt = async (st, btn) => { btn.disabled = true; try { const r = await run('api_action', K, it.row, { type: 'status', status: st }); Object.assign(it, r.rec); fixRec(it); toast(r.msg); openLetter(it); if (S.view === 'letters') doSearch(); } catch (e) { toast(errMsg(e)); btn.disabled = false; } };
+  if ($('#ltDone')) $('#ltDone').onclick = e => setSt('เสร็จสิ้น', e.currentTarget);
+  if ($('#ltReopen')) $('#ltReopen').onclick = e => setSt('กำลังดำเนินการ', e.currentTarget);
   const inp = $('#upFiles'), drop = $('#upDrop');
   const up = async fs => {
     if (!fs.length) return;
@@ -509,6 +535,58 @@ function openLetter(it) {
   drop.ondragover = e => { e.preventDefault(); drop.classList.add('on'); };
   drop.ondragleave = () => drop.classList.remove('on');
   drop.ondrop = e => { e.preventDefault(); up([...e.dataTransfer.files]); };
+}
+function editLetter(it) {
+  const m = S.meta || {};
+  const opts = (arr, cur) => '<option value="">—</option>' + Array.from(new Set([cur].concat(arr || []).filter(Boolean))).map(x => `<option ${x === cur ? 'selected' : ''}>${esc(x)}</option>`).join('');
+  const inp = (id, label, val, cls, extra) => `<div class="f ${cls || 'c6'}"><label for="${id}">${label}</label><input id="${id}" value="${esc(val || '')}" ${extra || ''}></div>`;
+  openDrawer('แก้ไข ' + esc(it.label || ''), `<form class="form" id="edForm" novalidate>
+    ${inp('edDate', 'ลงวันที่', it.date, 'c3 wide', 'type="date"')}
+    <div class="f c3 wide"><label for="edLw">หนังสือ ลว. (เว้นว่าง = ไม่เปลี่ยน)</label><input id="edLw" type="date"></div>
+    ${inp('edBook', 'ที่ (เลขที่หนังสือ)', it.book)}
+    <div class="f c6"><label for="edSubj">เรื่อง *</label><textarea id="edSubj" rows="3">${esc(it.subject)}</textarea></div>
+    ${inp('edFrom', 'จาก', it.from, 'c3 wide')}${inp('edTo', 'ถึง / เรียน', it.to, 'c3 wide')}
+    <div class="f c3 wide"><label for="edCat">หมวดเรื่อง</label><select id="edCat">${opts(m.cats, it.cat)}</select></div>
+    <div class="f c3 wide"><label for="edPur">วัตถุประสงค์</label><select id="edPur">${opts(m.purposes, it.purpose)}</select></div>
+    ${inp('edOwner', 'ผู้รับผิดชอบ', it.owner, 'c3 wide', 'list="edNames"')}<datalist id="edNames">${(m.names || []).map(x => `<option value="${esc(x)}">`).join('')}</datalist>
+    <div class="f c3 wide"><label for="edSt">สถานะ</label><select id="edSt">${opts(['รอดำเนินการ', 'กำลังดำเนินการ', 'ส่งต่อแล้ว', 'เสร็จสิ้น'], it.status)}</select></div>
+    <div class="f c3 wide"><label for="edUrg">ชั้นความเร็ว</label><select id="edUrg">${opts(m.urg, it.urg)}</select></div>
+    <div class="f c3 wide"><label for="edSec">ชั้นความลับ</label><select id="edSec">${opts(m.sec, it.sec)}</select></div>
+    ${inp('edNote', 'หมายเหตุ / การสั่งการ', it.note)}
+    <h3>ที่เก็บตัวจริง</h3>${inp('edRoom', 'ห้อง', it.room, 'c3 wide')}${inp('edCab', 'ตู้', it.cab, 'c3 wide')}${inp('edShelf', 'ชั้น', it.shelf, 'c3 wide')}${inp('edFolder', 'แฟ้ม', it.folder, 'c3 wide')}
+    <p class="note c6" id="edMsg" style="margin:0;color:var(--crit)"></p></form>`,
+    `<button class="btn primary" id="edSave">${ic('check')} บันทึกการแก้ไข</button><button class="btn" id="edBack">ยกเลิก</button>`);
+  $('#edBack').onclick = () => openLetter(it);
+  $('#edSave').onclick = async () => {
+    const v = id => $(id).value.trim();
+    if (!v('#edSubj')) { $('#edMsg').textContent = 'เรื่องต้องไม่ว่าง'; return; }
+    const f = { date: v('#edDate'), book: v('#edBook'), subject: v('#edSubj'), from: v('#edFrom'), to: v('#edTo'), cat: v('#edCat'), purpose: v('#edPur'),
+      owner: v('#edOwner'), status: v('#edSt'), urg: v('#edUrg'), sec: v('#edSec'), note: v('#edNote'), room: v('#edRoom'), cab: v('#edCab'), shelf: v('#edShelf'), folder: v('#edFolder') };
+    if (v('#edLw')) f.lw = v('#edLw');
+    const b = $('#edSave'); b.disabled = true; b.innerHTML = '<span class="spin"></span> กำลังบันทึก…';
+    try { const rec = await run('api_update', K, it.row, f); Object.assign(it, rec); fixRec(it); sortRecs(); toast('บันทึกการแก้ไขแล้ว'); openLetter(it); if (S.view === 'letters') doSearch(); }
+    catch (e) { $('#edMsg').textContent = errMsg(e); b.disabled = false; b.innerHTML = ic('check') + ' บันทึกการแก้ไข'; }
+  };
+}
+function forwardLetter(it) {
+  const names = (S.meta && S.meta.names) || [];
+  const canLine = !!(S.line && S.line.token && S.line.recipients);
+  openDrawer('ส่งต่อ ' + esc(it.label || ''), `<p class="note" style="margin:0">${esc(it.subject)}</p>
+    <div class="f"><label for="fwTo">ส่งต่อถึง *</label><input id="fwTo" list="fwNames" placeholder="เช่น อ.จรุงไทย / คุณกัลยา"><datalist id="fwNames">${names.map(x => `<option value="${esc(x)}">`).join('')}</datalist></div>
+    <div class="f"><label for="fwNote">หมายเหตุ / การสั่งการ</label><textarea id="fwNote" rows="3" placeholder="เช่น เพื่อพิจารณา ภายใน 20 พ.ย."></textarea></div>
+    <div class="f"><label for="fwSt">สถานะหลังส่งต่อ</label><select id="fwSt"><option>ส่งต่อแล้ว</option><option>กำลังดำเนินการ</option><option>เสร็จสิ้น</option></select></div>
+    <label class="switch"><input type="checkbox" id="fwLine" ${canLine ? 'checked' : 'disabled'}> แจ้งทาง LINE ด้วย${canLine ? '' : ' (ตั้งค่า LINE ก่อน)'}</label>
+    <p class="note" id="fwMsg" style="margin:0;color:var(--crit)"></p>`,
+    `<button class="btn primary" id="fwGo">${ic('send')} บันทึกการส่งต่อ</button><button class="btn" id="fwBack">ยกเลิก</button>`);
+  $('#fwTo').focus();
+  $('#fwBack').onclick = () => openLetter(it);
+  $('#fwGo').onclick = async () => {
+    const to = $('#fwTo').value.trim(); if (!to) { $('#fwMsg').textContent = 'กรุณาระบุว่าส่งต่อถึงใคร'; return; }
+    const b = $('#fwGo'); b.disabled = true; b.innerHTML = '<span class="spin"></span> กำลังบันทึก…';
+    try { const r = await run('api_action', K, it.row, { type: 'forward', to: to, note: $('#fwNote').value.trim(), status: $('#fwSt').value, line: $('#fwLine').checked });
+      Object.assign(it, r.rec); fixRec(it); toast(r.msg); openLetter(it); if (S.view === 'letters') doSearch(); }
+    catch (e) { $('#fwMsg').textContent = errMsg(e); b.disabled = false; b.innerHTML = ic('send') + ' บันทึกการส่งต่อ'; }
+  };
 }
 function readFiles(fs) {
   return Promise.all(fs.map(f => new Promise((ok, no) => {
@@ -631,7 +709,7 @@ function thDate(x) { if (!x) return ''; const p = String(x).split('-').map(Numbe
 function fixRec(o) {
   o.files = Array.isArray(o.files) ? o.files : String(o.files || '').split('\n').filter(Boolean);
   o.dateTH = thDate(o.date);
-  o.hay = normT([o.label, o.book, o.subject, o.from, o.to, o.cat, o.owner, o.doer, o.purpose, o.venue, o.note, o.folder, o.old].join(' '));
+  o.hay = normT([o.label, o.book, o.subject, o.from, o.to, o.cat, o.owner, o.doer, o.purpose, o.venue, o.note, o.folder, o.old, o.status].join(' '));
   return o;
 }
 function toRec(a) { const o = {}; S.cols.forEach((c, i) => { o[c] = a[i]; }); return fixRec(o); }
@@ -642,7 +720,7 @@ function searchLocal(q, opt) {
   if (m) qq = m[1] + ' ' + ('000' + m[2]).slice(-4) + '/' + m[3];
   const terms = qq ? (m ? [qq] : qq.split(' ').filter(Boolean)) : [];
   const out = S.recs.filter(r => (!opt.year || String(r.year) === String(opt.year)) && (!opt.dir || r.dir === opt.dir) &&
-    (!opt.att || r.files.length) && terms.every(x => r.hay.indexOf(x) >= 0));
+    (!opt.att || r.files.length) && (!opt.st || (r.status || '') === opt.st) && terms.every(x => r.hay.indexOf(x) >= 0));
   return { total: out.length, items: out.slice(0, opt.limit || 30) };
 }
 async function refreshUp() { try { S.upEvents = await run('api_events', K, 'upcoming'); } catch (e) { } }
@@ -668,13 +746,14 @@ async function loadHome() {
   try {
     if (!S.recs) return;
     const yy = String(S.meta.year); let inY = 0, outY = 0, att = 0;
-    S.recs.forEach(r => { if (r.files.length) att++; if (String(r.year) === yy) { if (r.dir === 'ส่ง') outY++; else inY++; } });
+    let pend = 0;
+    S.recs.forEach(r => { if (r.files.length) att++; if (r.status === 'รอดำเนินการ' || r.status === 'กำลังดำเนินการ') pend++; if (String(r.year) === yy) { if (r.dir === 'ส่ง') outY++; else inY++; } });
     const today = iso(new Date()), until = addD(today, 13);
     const d = S.home = { total: S.recs.length, year: yy, inYear: inY, outYear: outY, withFile: att, line: S.line,
       upcoming: (S.upEvents || []).filter(x => x.date >= today && x.date <= until).slice(0, 12), recent: S.recs.slice(0, 6) };
     if (S.view !== 'home') return;
     const st = (label, v, c, icon) => `<div class="panel stat"><span class="stic" style="--c:${c}">${ic(icon)}</span><div><small>${label}</small><b>${Number(v).toLocaleString()}</b></div></div>`;
-    $('#hStats').innerHTML = st('หนังสือทั้งหมด', d.total, 'var(--accent)', 'file') + st('หนังสือรับ ปี ' + d.year, d.inYear, 'var(--in)', 'inbox') + st('หนังสือส่ง ปี ' + d.year, d.outYear, 'var(--out)', 'send') + st('มีไฟล์แนบ', d.withFile, 'var(--rose)', 'clip');
+    $('#hStats').innerHTML = st('หนังสือทั้งหมด', d.total, 'var(--accent)', 'file') + st('หนังสือรับ ปี ' + d.year, d.inYear, 'var(--in)', 'inbox') + st('หนังสือส่ง ปี ' + d.year, d.outYear, 'var(--out)', 'send') + `<a class="statlink" href="#" data-pending>${st('รอดำเนินการ', pend, 'var(--amber)', 'clock')}</a>`;
     $('#hEv').innerHTML = d.upcoming.length ? d.upcoming.map(upRow).join('') : `<div class="empty">${ic('cal')}ไม่มีงานใน 14 วันข้างหน้า${ADMIN ? '<br><button class="btn sm" id="hAdd" style="margin-top:10px">' + ic('plus') + ' เพิ่มงาน</button>' : ''}</div>`;
     $('#hRec').innerHTML = d.recent.map(miniLetter).join('') || '<div class="empty">ยังไม่มีหนังสือ</div>';
     $('#hEv').onclick = e => { const r = e.target.closest('[data-ui]'); if (r) openEvent(d.upcoming[+r.dataset.ui]); if (e.target.closest('#hAdd')) eventForm(); };
@@ -695,17 +774,19 @@ function viewLetters() {
     <div class="toolbar"><label class="search">${ic('search')}<input id="q" type="search" placeholder="พิมพ์คำค้น…" autocomplete="off" value="${esc(S.q)}"></label>
       <div class="filters"><select id="year" aria-label="ปี พ.ศ."><option value="">ทุกปี</option>${years.map(y => `<option ${S.year === y ? 'selected' : ''}>${y}</option>`).join('')}</select>
         <span class="seg" id="dirSeg">${[['', 'ทั้งหมด'], ['รับ', 'รับ'], ['ส่ง', 'ส่ง']].map(([v, l]) => `<button data-d="${v}" aria-pressed="${S.dir === v}">${l}</button>`).join('')}</span>
+        <select id="stSel" aria-label="สถานะ"><option value="">ทุกสถานะ</option>${['รอดำเนินการ', 'กำลังดำเนินการ', 'ส่งต่อแล้ว', 'เสร็จสิ้น'].map(x => `<option ${S.st === x ? 'selected' : ''}>${x}</option>`).join('')}</select>
         <label class="tgl"><input id="att" type="checkbox" ${S.att ? 'checked' : ''}>${ic('clip')} มีไฟล์แนบ</label></div></div>
     <p class="status" id="status"></p><div class="list" id="cards"></div>`;
   let t; $('#q').oninput = e => { clearTimeout(t); t = setTimeout(() => { S.q = e.target.value.trim(); S.limit = 30; doSearch(); }, 150); };
   $('#year').onchange = e => { S.year = e.target.value; S.limit = 30; doSearch(); };
   $('#att').onchange = e => { S.att = e.target.checked; S.limit = 30; doSearch(); };
+  $('#stSel').onchange = e => { S.st = e.target.value; S.limit = 30; doSearch(); };
   $('#dirSeg').onclick = e => { const b = e.target.closest('button'); if (!b) return; S.dir = b.dataset.d; $('#dirSeg').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b)); S.limit = 30; doSearch(); };
   $('#cards').onclick = e => { if (e.target.closest('a')) return; if (e.target.closest('#moreBtn')) { S.limit += 30; doSearch(); return; } const c = e.target.closest('[data-i]'); if (c) openLetter(S.items[+c.dataset.i]); };
   doSearch();
 }
 function doSearch() {
-  const r = searchLocal(S.q, { year: S.year, dir: S.dir, att: S.att, limit: S.limit });
+  const r = searchLocal(S.q, { year: S.year, dir: S.dir, att: S.att, st: S.st, limit: S.limit });
   S.items = r.items; S.total = r.total; renderLetters();
 }
 function renderLetters() {
@@ -776,7 +857,15 @@ function viewNew() {
   $('#nFiles').onchange = () => { files = [...$('#nFiles').files]; showFiles(); };
   const dr = $('#nDrop'); dr.ondragover = e => { e.preventDefault(); dr.classList.add('on'); }; dr.ondragleave = () => dr.classList.remove('on');
   dr.ondrop = e => { e.preventDefault(); dr.classList.remove('on'); files = [...e.dataTransfer.files]; showFiles(); };
-  $('#nDir').onclick = e => { const b = e.target.closest('button'); if (!b) return; nd = b.dataset.d; $('#nDir').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b)); };
+  const setPh = () => {
+    const out = nd === 'ส่ง';
+    $('#nBook').placeholder = out ? 'เว้นว่าง = MDJ ' + (m.next['ส่ง'] || '') + '/' + m.year + ' อัตโนมัติ' : 'เช่น อว 78.0616/1234 (เลขที่บนหนังสือที่ได้รับ)';
+    $('#nFrom').placeholder = out ? 'เว้นว่าง = สาขาวิชาประสาทวิทยา' : 'หน่วยงานที่ส่งมา';
+    $('#nTo').placeholder = out ? 'ส่งถึงใคร เช่น หัวหน้าภาควิชาอายุรศาสตร์' : 'เช่น หัวหน้าสาขาวิชาประสาทวิทยา';
+    $('#nDate').previousElementSibling.textContent = out ? 'วันที่ส่ง' : 'วันที่รับ';
+  };
+  setPh();
+  $('#nDir').onclick = e => { const b = e.target.closest('button'); if (!b) return; nd = b.dataset.d; $('#nDir').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b)); setPh(); };
   $('#fNew').onsubmit = async e => {
     e.preventDefault();
     const v = id => $(id).value.trim();
@@ -797,45 +886,79 @@ function viewNew() {
 
 /* ======================= VIEW: LINE settings (admin) ======================= */
 function viewLine() {
-  $('#view').innerHTML = `<div class="ph"><div><h1>ตั้งค่า LINE & การแชร์</h1><p>สถานะการเชื่อม LINE OA ผู้รับแจ้งเตือน และลิงก์สำหรับผู้ดู</p></div>
+  $('#view').innerHTML = `<div class="ph"><div><h1>ตั้งค่า LINE & การแชร์</h1><p>ทำตามขั้น 1 → 3 ครั้งเดียว แล้วระบบส่งแจ้งเตือนงานเข้า LINE ให้ทุกเช้า</p></div>
     <div class="act"><button class="btn" id="lnPrev">${ic('eye')} ตัวอย่างพรุ่งนี้</button><button class="btn primary" id="lnAnn">${ic('mega')} ส่งประกาศ</button></div></div>
-    <div id="lnBody" class="cards3"><div class="panel pb"><div class="sk"></div><div class="sk" style="margin-top:10px"></div></div><div class="panel pb"><div class="sk"></div></div></div>`;
+    <div id="lnBody"><div class="panel pb"><div class="sk"></div><div class="sk" style="margin-top:10px"></div></div></div>`;
   $('#lnPrev').onclick = previewDrawer; $('#lnAnn').onclick = announceDrawer;
   loadLine();
 }
-async function loadLine() {
+function stepHead(n, title, done) {
+  return `<h2><span class="stepn ${done ? 'ok' : ''}">${done ? ic('check') : n}</span>${title}</h2>`;
+}
+async function loadLine(flash) {
   try {
     const s = await run('api_lineStatus', K);
     if (S.view !== 'line') return;
-    const row = (ok, title, sub) => `<div class="srow"><span class="sic ${ok === true ? 'ok' : ok === false ? 'bad' : ''}">${ic(ok === true ? 'check' : ok === false ? 'x' : 'bell')}</span><div class="x"><b>${title}</b><small>${sub}</small></div></div>`;
+    S.line = { token: s.token && s.tokenOk, recipients: s.recipients.length, auto: s.auto, hour: s.hour };
     const q = s.quota; const pct = q && q.limit ? Math.min(100, Math.round(q.used / q.limit * 100)) : 0;
-    $('#lnBody').innerHTML = `
-      <section class="panel"><h2>${ic('chat')} การเชื่อม LINE OA</h2>
-        ${row(s.token && s.tokenOk, s.token ? (s.tokenOk ? 'เชื่อม LINE OA แล้ว' : 'Token ใช้ไม่ได้') : 'ยังไม่ได้ใส่ Channel access token', s.token ? (s.tokenOk ? 'ส่งข้อความได้' : 'ออก token ใหม่ใน LINE Developers แล้วใส่ในชีต') : 'ชีต → เมนู 📁 สารบรรณ → LINE: ตั้ง Channel access token')}
-        ${row(s.recipients.length > 0, 'ผู้รับแจ้งเตือน ' + s.recipients.length + ' ปลายทาง', s.recipients.length ? s.recipients.map(r => (r.kind === 'user' ? '👤 ' : '👥 ') + esc(r.name)).join(' · ') : 'ชีต → เมนู 📣 แจ้งเตือน LINE → ② เพิ่มผู้รับ')}
-        <div class="srow"><span class="sic ${s.auto ? 'ok' : ''}">${ic('clock')}</span><div class="x"><b>แจ้งเตือนอัตโนมัติทุกเช้า</b><small>${s.auto ? 'เปิดอยู่ · ส่งราว ' + s.hour + ':00–' + s.hour + ':59 น. (วันไม่มีงาน ไม่ส่ง)' : 'ปิดอยู่'}</small></div>
-          <label class="switch" aria-label="เปิดปิดแจ้งเตือนอัตโนมัติ"><input type="checkbox" id="autoSw" ${s.auto ? 'checked' : ''}></label></div>
-        <div class="pb" style="border-top:1px solid var(--line)"><button class="btn sm" id="lnNow">${ic('send')} ส่งแจ้งเตือนรอบวันนี้ทันที</button></div>
-      </section>
-      <section class="panel"><h2>${ic('bell')} โควตาข้อความเดือนนี้</h2><div class="pb">
-        ${q ? `<b style="font-size:26px">${q.used.toLocaleString()}</b> <span class="note">${q.limit ? '/ ' + q.limit.toLocaleString() + ' ข้อความ' : 'ข้อความ (ไม่จำกัด)'}</span>${q.limit ? `<div class="meter"><i style="width:${pct}%;${pct > 80 ? 'background:var(--crit)' : ''}"></i></div><span class="note">เหลือ ${Math.max(0, q.limit - q.used).toLocaleString()} ข้อความ</span>` : ''}`
-          : '<span class="note">ยังอ่านโควตาไม่ได้ (ต้องเชื่อม LINE OA ก่อน)</span>'}
-        <p class="note" style="margin:12px 0 0">ส่งถึงตัวเอง 1 ครั้ง = 1 ข้อความ · ส่งเข้ากลุ่ม 1 ครั้ง = จำนวนสมาชิกในกลุ่ม · คำสั่ง <b>งานวันนี้ / งานพรุ่งนี้</b> และผลค้นหาใน LINE เป็นการตอบกลับ ไม่นับโควตา</p></div>
-      </section>
-      <section class="panel"><h2>${ic('users')} แชร์ให้คนอื่นดู (แก้ไขไม่ได้)</h2><div class="pb" style="display:flex;flex-direction:column;gap:12px">
-        <div><div class="note" style="margin-bottom:6px">ลิงก์ผู้ดู — ส่งให้อาจารย์/เจ้าหน้าที่</div>${s.viewUrl ? `<div class="copy"><input readonly value="${esc(s.viewUrl)}" id="vUrl"><button class="btn sm" id="vCopy">${ic('copy')} คัดลอก</button></div>` : '<span class="note">ชีต → เมนู 📁 สารบรรณ → ① ตั้งค่าเริ่มต้น เพื่อสร้างลิงก์</span>'}</div>
-        <div class="note">ผู้ดูที่เปิดไฟล์แนบได้: <b>${s.viewers}</b> คน · ผู้ใช้ LINE ที่ค้นหาได้: <b>${s.lineUsers}</b> คน · ผู้ประกาศผ่าน LINE: <b>${s.admins}</b> คน<br>เพิ่ม/ลบได้ที่เมนูในชีต (👁 ผู้ดู, LINE: เพิ่มผู้ใช้, ③ เพิ่มผู้ประกาศ)</div>
-        ${s.webhook ? `<div><div class="note" style="margin-bottom:6px">Webhook URL สำหรับ LINE Developers</div><div class="copy"><input readonly value="${esc(s.webhook)}" id="wUrl"><button class="btn sm" id="wCopy">${ic('copy')}</button></div></div>` : ''}
-      </div></section>`;
-    const cp = (btn, inp) => { if ($(btn)) $(btn).onclick = async () => { try { await navigator.clipboard.writeText($(inp).value); toast('คัดลอกแล้ว'); } catch (e) { $(inp).select(); toast('กด Ctrl+C เพื่อคัดลอก'); } }; };
-    cp('#vCopy', '#vUrl'); cp('#wCopy', '#wUrl');
+    const okTok = s.token && s.tokenOk;
+    const copyRow = (id, val) => `<div class="copy"><input readonly value="${esc(val)}" id="${id}"><button class="btn sm" data-copy="${id}">${ic('copy')} คัดลอก</button></div>`;
+    const rmBtn = (who, id) => `<button class="btn sm danger" data-rm="${who}" data-id="${esc(id)}">${ic('trash')}</button>`;
+    $('#lnBody').innerHTML = `${flash ? `<div class="alert" style="background:var(--in-soft);color:var(--ok)">${ic('check')}<b>${esc(flash)}</b></div>` : ''}
+    <div class="lgrid">
+      <section class="panel">${stepHead(1, 'เชื่อม LINE OA กับระบบ', okTok)}<div class="pb lstack">
+        <div><div class="lab">1.1 Webhook URL — วางใน LINE Developers → Messaging API → Webhook URL แล้วเปิด <b>Use webhook</b></div>${copyRow('wUrl', s.webhook)}</div>
+        <div><div class="lab">1.2 Channel access token (long-lived) — กด Issue ใน LINE Developers แล้วคัดลอกมาวาง</div>
+          ${okTok ? `<div class="okline">${ic('check')} เชื่อมแล้ว · Token ${esc(s.tokenTail)}</div>` : s.token ? `<div class="badline">${ic('x')} Token ใช้ไม่ได้ — วางตัวใหม่</div>` : ''}
+          <div class="copy"><input id="tokIn" type="password" placeholder="วาง Channel access token ที่นี่" autocomplete="off"><button class="btn sm primary" id="tokSave">บันทึก</button></div></div>
+        <div class="note">ทดสอบ: เพิ่มเพื่อน LINE OA แล้วพิมพ์ <code>id</code> — ถ้า OA ตอบรหัส U… กลับมา แปลว่าเชื่อมสำเร็จ</div>
+      </div></section>
+      <section class="panel">${stepHead(2, 'ผู้รับแจ้งเตือน', s.recipients.length > 0)}<div class="pb lstack">
+        <div class="note">• <b>ส่งถึงตัวเอง (ประหยัดที่สุด):</b> ในแชต OA พิมพ์ <code>id</code> → คัดลอกรหัส U… มาวาง<br>• <b>ส่งเข้ากลุ่ม:</b> เชิญ OA เข้ากลุ่ม LINE → OA ทักพร้อมรหัสกลุ่ม C… (หรือกดเพิ่มจากรายการด้านล่าง)</div>
+        <div class="copy"><input id="rcIn" placeholder="รหัส U… หรือ C… (33 ตัว)" autocomplete="off" spellcheck="false"><button class="btn sm primary" id="rcAdd">${ic('plus')} เพิ่ม</button></div>
+        <div class="lrows">${s.recipients.map(r => `<div class="lrow"><span class="sic ${r.kind === 'user' ? 'ok' : ''}">${ic(r.kind === 'user' ? 'user' : 'users')}</span><div class="x"><b>${esc(r.name)}</b><small class="mono">${esc(r.id)}</small></div>${rmBtn('recipient', r.id)}</div>`).join('') || '<div class="note">— ยังไม่มีผู้รับ —</div>'}</div>
+        ${(s.seen || []).filter(g => !s.recipients.some(r => r.id === g.id)).length ? `<div><div class="lab">กลุ่มที่ OA เพิ่งถูกเชิญเข้า</div><div class="lrows">${s.seen.filter(g => !s.recipients.some(r => r.id === g.id)).map(g => `<div class="lrow"><span class="sic">${ic('users')}</span><div class="x"><b>${esc(g.name)}</b><small>เข้ากลุ่มเมื่อ ${esc(g.at)}</small></div><button class="btn sm" data-addseen="${esc(g.id)}">${ic('plus')} เพิ่ม</button></div>`).join('')}</div></div>` : ''}
+      </div></section>
+      <section class="panel">${stepHead(3, 'แจ้งเตือนอัตโนมัติทุกเช้า', s.auto)}<div class="pb lstack">
+        <label class="switch"><input type="checkbox" id="autoSw" ${s.auto ? 'checked' : ''}> ${s.auto ? 'เปิดอยู่ · ส่งราว ' + s.hour + ':00–' + s.hour + ':59 น. (วันไม่มีงาน ไม่ส่ง)' : 'ปิดอยู่ — กดเพื่อเปิด'}</label>
+        <div><button class="btn sm" id="lnNow">${ic('send')} ส่งรอบวันนี้ทันที</button> <button class="btn sm" data-nav="events">${ic('cal')} ไปเพิ่มงาน</button></div>
+        <div><div class="lab">โควตาข้อความเดือนนี้</div>${q ? `<b style="font-size:22px">${q.used.toLocaleString()}</b> <span class="note">${q.limit ? '/ ' + q.limit.toLocaleString() + ' ข้อความ' : 'ข้อความ (ไม่จำกัด)'}</span>${q.limit ? `<div class="meter"><i style="width:${pct}%;${pct > 80 ? 'background:var(--crit)' : ''}"></i></div>` : ''}` : '<span class="note">อ่านได้หลังเชื่อม LINE OA</span>'}
+          <div class="note">ส่งถึงตัวเอง 1 ครั้ง = 1 ข้อความ · เข้ากลุ่ม = จำนวนสมาชิก · คำสั่ง งานวันนี้/งานพรุ่งนี้ ไม่นับโควตา</div></div>
+      </div></section>
+      <section class="panel"><h2>${ic('search')} ค้นหาหนังสือผ่าน LINE</h2><div class="pb lstack">
+        <div class="note">คนที่อยู่ในรายการนี้พิมพ์คำค้นในแชต OA แล้วได้ผลพร้อมปุ่มเปิดหนังสือ (อ่านอย่างเดียว) — ให้เขาพิมพ์ <code>id</code> แล้วส่งรหัสมาให้คุณ</div>
+        <div class="copy"><input id="usIn" placeholder="รหัส U… (33 ตัว)" autocomplete="off" spellcheck="false"><button class="btn sm primary" id="usAdd">${ic('plus')} เพิ่ม</button></div>
+        <div class="lrows">${(s.users || []).map(u => `<div class="lrow"><span class="sic">${ic('user')}</span><div class="x"><small class="mono">${esc(u)}</small></div>${rmBtn('user', u)}</div>`).join('') || '<div class="note">— ยังไม่มี —</div>'}</div>
+      </div></section>
+      <section class="panel"><h2>${ic('users')} แชร์ให้คนอื่นดู (แก้ไขไม่ได้)</h2><div class="pb lstack">
+        <div><div class="lab">ลิงก์ผู้ดู — ส่งให้อาจารย์/เจ้าหน้าที่</div>${copyRow('vUrl', s.viewUrl)}</div>
+        <div class="note">เปลี่ยนรหัสผู้ดู/ผู้ดูแลเอง: Apps Script → ⚙ การตั้งค่าโปรเจ็กต์ → คุณสมบัติของสคริปต์ → PAGE_KEY / VIEW_KEY</div>
+      </div></section>
+    </div>`;
+    const body = $('#lnBody');
+    body.onclick = async e => {
+      const c = e.target.closest('[data-copy]');
+      if (c) { const inp = $('#' + c.dataset.copy); try { await navigator.clipboard.writeText(inp.value); toast('คัดลอกแล้ว'); } catch (er) { inp.select(); toast('กด Ctrl+C เพื่อคัดลอก'); } return; }
+      const rm = e.target.closest('[data-rm]');
+      if (rm) { if (!confirm('ลบ ' + rm.dataset.id + ' ?')) return; return lineOp(() => run('api_lineList', K, rm.dataset.rm, 'remove', rm.dataset.id)); }
+      const as = e.target.closest('[data-addseen]');
+      if (as) return lineOp(() => run('api_lineList', K, 'recipient', 'add', as.dataset.addseen), as);
+    };
+    $('#tokSave').onclick = () => lineOp(() => run('api_lineToken', K, $('#tokIn').value), $('#tokSave'));
+    $('#rcAdd').onclick = () => lineOp(() => run('api_lineList', K, 'recipient', 'add', $('#rcIn').value), $('#rcAdd'));
+    $('#usAdd').onclick = () => lineOp(() => run('api_lineList', K, 'user', 'add', $('#usIn').value), $('#usAdd'));
     $('#lnNow').onclick = sendNow;
     $('#autoSw').onchange = async e => {
       const on = e.target.checked; e.target.disabled = true;
-      try { const r = await run('api_setAuto', K, on); toast(r ? 'เปิดแจ้งเตือนอัตโนมัติแล้ว' : 'ปิดแจ้งเตือนอัตโนมัติแล้ว'); loadLine(); }
+      try { const r = await run('api_setAuto', K, on); loadLine(r ? 'เปิดแจ้งเตือนอัตโนมัติแล้ว' : 'ปิดแจ้งเตือนอัตโนมัติแล้ว'); }
       catch (er) { toast(errMsg(er)); e.target.checked = !on; e.target.disabled = false; }
     };
   } catch (e) { $('#lnBody').innerHTML = `<div class="warnbox">${esc(errMsg(e))}</div>`; }
+}
+async function lineOp(fn, btn) {
+  if (btn) { btn.disabled = true; btn.dataset.t = btn.innerHTML; btn.innerHTML = '<span class="spin"></span>'; }
+  try { const r = await fn(); loadLine(r && r.msg); }
+  catch (e) { toast(errMsg(e)); if (btn) { btn.disabled = false; btn.innerHTML = btn.dataset.t; } }
 }
 
 /* ======================= start ======================= */
