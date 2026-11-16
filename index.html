@@ -1,709 +1,146 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-<base target="_blank">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#2952CC">
+<title>สารบรรณออนไลน์ · ประสาทวิทยา</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%232952CC'/%3E%3Cstop offset='1' stop-color='%236C4BD5'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Cpath d='M20 18h17l7 7v21H20z' fill='none' stroke='white' stroke-width='4' stroke-linejoin='round'/%3E%3Cpath d='M26 33h12M26 40h8' stroke='white' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700&display=swap">
+<script>
+/* ===================== ตั้งค่า (แก้บรรทัดเดียว) =====================
+   วาง URL เว็บแอปจาก Apps Script ระหว่าง '' (ลงท้าย /exec ห้ามใส่ ?k=)
+   เช่น const APP_URL = 'https://script.google.com/macros/s/AKfy…/exec';
+   ถ้าเว้นว่าง ผู้ใช้ต้องวาง "ลิงก์เต็ม" ที่ได้จากผู้ดูแลในครั้งแรก
+   ================================================================== */
+const APP_URL = 'https://script.google.com/macros/s/AKfycbydO5TYItM3wGlfrm_m5yymXvUYJCwTnGEYmM1CduZGOrZ7hSbck0Mu_01Dzbl29A8/exec';
+</script>
 <style>
-:root{
-  --bg:#F4F6FA;--surface:#FFFFFF;--surface-2:#F0F2F7;--line:#E2E6EE;--ink:#141B2D;--ink-2:#4A5468;--ink-3:#8590A5;
-  --accent:#2952CC;--accent-ink:#FFFFFF;--accent-soft:#E8EEFC;
-  --in:#0E8A5F;--in-soft:#E3F5EE;--out:#5B4BD5;--out-soft:#EDEBFC;
-  --amber:#B86E00;--amber-soft:#FDF1DC;--violet:#7A3FC9;--violet-soft:#F1E9FC;--blue:#1F6FD1;--blue-soft:#E5F0FC;
-  --rose:#C9264B;--rose-soft:#FCE7EC;--slate:#5B6577;--slate-soft:#EEF0F4;--ok:#0E8A5F;--warn:#B86E00;--crit:#C9264B;
-  --radius:14px;--shadow:0 1px 2px rgba(20,27,45,.05),0 4px 16px rgba(20,27,45,.05);
-  --f:"Noto Sans Thai","Sarabun","Leelawadee UI",Tahoma,sans-serif;--mono:"IBM Plex Mono",ui-monospace,"Noto Sans Thai","Sarabun",Tahoma,monospace;
-}
-@media (prefers-color-scheme:dark){:root{color-scheme:dark;
-  --bg:#0D1220;--surface:#151C2C;--surface-2:#1C2436;--line:#283248;--ink:#E6EAF2;--ink-2:#A9B3C6;--ink-3:#77829A;
-  --accent:#7EA2FF;--accent-ink:#0B1530;--accent-soft:#1D2A4D;--in:#4FCB9B;--in-soft:#14302A;--out:#A79BFF;--out-soft:#26214A;
-  --amber:#F0B34E;--amber-soft:#3A2C12;--violet:#C49BFF;--violet-soft:#2E2147;--blue:#7DB4FF;--blue-soft:#172B47;
-  --rose:#FF8DA6;--rose-soft:#3F1B27;--slate:#AAB4C6;--slate-soft:#232B3B;--shadow:0 1px 2px rgba(0,0,0,.3)}}
+:root{--bg:#F4F6FA;--surface:#fff;--line:#E2E6EE;--ink:#141B2D;--ink-2:#4A5468;--ink-3:#8590A5;--accent:#2952CC;--soft:#E8EEFC;--crit:#C9264B;
+  --f:"Noto Sans Thai","Sarabun","Leelawadee UI",Tahoma,sans-serif}
+@media (prefers-color-scheme:dark){:root{color-scheme:dark;--bg:#0D1220;--surface:#151C2C;--line:#283248;--ink:#E6EAF2;--ink-2:#A9B3C6;--ink-3:#77829A;--accent:#7EA2FF;--soft:#1D2A4D;--crit:#FF8DA6}}
 *{box-sizing:border-box}[hidden]{display:none!important}
-html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
-button,input,select,textarea{font:inherit;color:inherit}button{cursor:pointer}a{color:var(--accent)}
-:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-svg.i{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
-.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
-
-/* ---------- layout ---------- */
-.app{display:grid;grid-template-columns:248px 1fr;min-height:100vh;background:linear-gradient(to right,var(--surface) 247px,var(--line) 247px,var(--line) 248px,transparent 248px)}
-.side{position:sticky;top:0;height:100vh;display:flex;flex-direction:column;padding:18px 14px;gap:6px}
-.logo{display:flex;align-items:center;gap:10px;padding:4px 8px 16px}
-.logo .mk{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,var(--accent),#6C4BD5);color:#fff;display:grid;place-items:center;font-weight:700;font-size:14px}
-.logo b{display:block;font-size:15.5px;line-height:1.2}.logo small{color:var(--ink-3);font-size:12px}
-.nav{display:flex;flex-direction:column;gap:2px}
-.nav button{display:flex;align-items:center;gap:12px;border:0;background:transparent;padding:10px 12px;border-radius:10px;font-weight:500;color:var(--ink-2);text-align:left;font-size:15px}
-.nav button:hover{background:var(--surface-2)}
-.nav button[aria-current="page"]{background:var(--accent-soft);color:var(--accent);font-weight:600}
-.side .foot{margin-top:auto;padding:10px 8px;font-size:12.5px;color:var(--ink-3)}
-.role{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:3px 10px;border-radius:99px;background:var(--surface-2);color:var(--ink-2)}
-.role.admin{background:var(--accent-soft);color:var(--accent)}
-.main{min-width:0;padding:28px 32px 90px;max-width:1180px;width:100%}
-.topbar{display:none}
-.bnav{display:none}
-@media (max-width:900px){
-  .app{grid-template-columns:1fr;background:none}.side{display:none}
-  .main{padding:14px 16px calc(92px + env(safe-area-inset-bottom))}
-  .topbar{display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:15;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);padding:10px 16px;border-bottom:1px solid var(--line)}
-  .topbar .mk{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,var(--accent),#6C4BD5);color:#fff;display:grid;place-items:center;font-weight:700;font-size:12px}
-  .topbar b{font-size:15px}.topbar .role{margin-left:auto}
-  .bnav{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:15;background:var(--surface);border-top:1px solid var(--line);padding:6px 6px calc(6px + env(safe-area-inset-bottom))}
-  .bnav button{flex:1;border:0;background:transparent;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;color:var(--ink-3);padding:6px 2px;border-radius:10px;font-weight:500}
-  .bnav button[aria-current="page"]{color:var(--accent);font-weight:600}
-  .bnav button[aria-current="page"] svg{background:var(--accent-soft);border-radius:99px;padding:3px 14px;width:50px;height:28px}
-}
-
-/* ---------- common ---------- */
-.ph{display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap;margin:0 0 18px}
-.ph h1{font-size:24px;margin:0;line-height:1.25;letter-spacing:-.01em}
-.ph p{margin:2px 0 0;color:var(--ink-3);font-size:14px}
-.ph .act{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
-.btn{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:9px 14px;font-weight:600;font-size:14px;color:var(--ink);text-decoration:none;white-space:nowrap}
-.btn:hover{border-color:color-mix(in srgb,var(--accent) 40%,var(--line))}
-.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
-.btn.primary:hover{filter:brightness(1.06)}
-.btn.danger{color:var(--crit)}
-.btn.sm{padding:6px 11px;font-size:13px;border-radius:9px}
-.btn[disabled]{opacity:.55;cursor:wait}
-.btn svg.i{width:17px;height:17px}
-.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
-.panel>h2{font-size:15px;margin:0;padding:14px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px}
-.panel>h2 a,.panel>h2 button.link{margin-left:auto;font-size:13px;font-weight:500;border:0;background:none;color:var(--accent);padding:0}
-.pb{padding:14px 16px}
-.empty{text-align:center;color:var(--ink-3);padding:36px 12px;font-size:14px}
-.empty svg{width:34px;height:34px;opacity:.5;display:block;margin:0 auto 8px}
-.note{font-size:13px;color:var(--ink-3)}
-.chip{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;padding:2px 9px;border-radius:99px;background:var(--slate-soft);color:var(--slate);white-space:nowrap}
-.chip.in{background:var(--in-soft);color:var(--in)}.chip.out{background:var(--out-soft);color:var(--out)}
-.chip.warn{background:var(--amber-soft);color:var(--amber)}.chip.crit{background:var(--rose-soft);color:var(--rose)}
-.chip.ok{background:var(--in-soft);color:var(--ok)}
-.t-คุมสอบ{--c:var(--amber);--cs:var(--amber-soft)}.t-สอน{--c:var(--violet);--cs:var(--violet-soft)}
-.t-ประชุม{--c:var(--blue);--cs:var(--blue-soft)}.t-ประกาศ{--c:var(--rose);--cs:var(--rose-soft)}
-.t-อื่นๆ,.t-{--c:var(--slate);--cs:var(--slate-soft)}
-.chip.type{background:var(--cs);color:var(--c)}
-mark{background:color-mix(in srgb,#FFC83D 55%,transparent);color:inherit;border-radius:3px;padding:0 1px}
-.spin{display:inline-block;width:15px;height:15px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:s .8s linear infinite;vertical-align:-2px}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:var(--f);font-size:15px;line-height:1.6}
+button,input{font:inherit;color:inherit}
+/* ---------- หน้าเข้าใช้งาน ---------- */
+.gate{min-height:100%;display:grid;place-items:center;padding:24px 16px}
+.card{width:min(460px,100%);background:var(--surface);border:1px solid var(--line);border-radius:22px;box-shadow:0 10px 40px rgba(20,27,45,.08);overflow:hidden}
+.top{background:linear-gradient(120deg,#2952CC,#6C4BD5);color:#fff;padding:28px 26px 24px;position:relative;overflow:hidden}
+.top:after{content:"";position:absolute;right:-50px;top:-70px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.1)}
+.mk{width:48px;height:48px;border-radius:14px;background:rgba(255,255,255,.18);display:grid;place-items:center;font-weight:700;margin-bottom:14px}
+.top h1{margin:0;font-size:22px;line-height:1.3}.top p{margin:4px 0 0;opacity:.85;font-size:14px}
+.body{padding:22px 26px 26px;display:flex;flex-direction:column;gap:14px}
+label.l{font-size:13.5px;color:var(--ink-2);font-weight:500}
+.inp{width:100%;border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:12px 14px;font-size:15px;outline:0}
+.inp:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--soft)}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:12px;padding:12px 16px;font-weight:600;font-size:15px;cursor:pointer;background:var(--accent);color:#fff;width:100%}
+@media (prefers-color-scheme:dark){.btn{color:#0B1530}}
+.chk{display:flex;gap:8px;align-items:center;font-size:14px;color:var(--ink-2);cursor:pointer}
+.err{color:var(--crit);font-size:13.5px;min-height:1em}
+.hint{font-size:13px;color:var(--ink-3);border-top:1px solid var(--line);padding-top:14px}
+/* ---------- หน้าแอป ---------- */
+.app{position:fixed;inset:0;background:var(--bg)}
+.app iframe{width:100%;height:100%;border:0;display:block}
+.loading{position:absolute;inset:0;display:grid;place-items:center;color:var(--ink-3);font-size:14px;pointer-events:none}
+.spin{width:28px;height:28px;border:3px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:s .8s linear infinite;margin:0 auto 10px}
 @keyframes s{to{transform:rotate(360deg)}}
-.sk{background:linear-gradient(90deg,var(--surface-2),color-mix(in srgb,var(--surface-2) 40%,var(--surface)),var(--surface-2));background-size:200% 100%;animation:sk 1.2s infinite;border-radius:8px;height:14px}
-@keyframes sk{to{background-position:-200% 0}}
-.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:12px;z-index:60;font-size:14px;max-width:90vw;box-shadow:0 8px 24px rgba(0,0,0,.2)}
-@media (max-width:900px){.toast{bottom:96px}}
-
-/* ---------- home ---------- */
-.hero{border-radius:20px;padding:24px;background:linear-gradient(120deg,var(--accent),#6C4BD5);color:#fff;position:relative;overflow:hidden;margin-bottom:18px}
-.hero:after{content:"";position:absolute;right:-60px;top:-80px;width:260px;height:260px;border-radius:50%;background:rgba(255,255,255,.08)}
-.hero small{opacity:.85;font-size:13.5px}.hero h1{margin:2px 0 14px;font-size:24px;line-height:1.3}
-.hsearch{display:flex;align-items:center;gap:10px;background:#fff;color:#141B2D;border-radius:12px;padding:0 6px 0 14px;max-width:620px;position:relative;z-index:1}
-.hsearch input{flex:1;min-width:0;border:0;outline:0;background:transparent;padding:13px 0;font-size:16px;color:#141B2D}
-.hsearch .btn{background:var(--accent);color:#fff;border:0}
-@media (prefers-color-scheme:dark){.hsearch .btn{color:#fff;background:#2952CC}}
-.qa{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;position:relative;z-index:1}
-.qa button{border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.12);color:#fff;border-radius:99px;padding:6px 14px;font-weight:500;font-size:13.5px;display:inline-flex;gap:6px;align-items:center}
-.qa button:hover{background:rgba(255,255,255,.22)}.qa svg.i{width:16px;height:16px}
-.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:18px}
-.stat{padding:14px 16px}.stat small{color:var(--ink-3);font-size:13px;display:flex;align-items:center;gap:6px}
-.stat b{display:block;font-size:26px;font-weight:700;margin-top:2px;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
-.stat .dot{width:8px;height:8px;border-radius:50%;background:var(--c,var(--accent))}
-.grid2{display:grid;grid-template-columns:1.1fr 1fr;gap:16px;align-items:start}
-@media (max-width:1050px){.grid2{grid-template-columns:1fr}}
-@media (max-width:640px){.stats{grid-template-columns:1fr 1fr}.hero{padding:18px}.hero h1{font-size:20px}}
-.alert{display:flex;gap:12px;align-items:center;padding:12px 16px;border-radius:12px;background:var(--amber-soft);color:var(--amber);font-size:14px;margin-bottom:16px}
-.alert b{color:var(--ink)}.alert .btn{margin-left:auto}
-
-/* ---------- letters ---------- */
-.toolbar{position:sticky;top:0;z-index:10;background:var(--bg);padding:2px 0 12px;display:flex;flex-direction:column;gap:10px}
-@media (max-width:900px){.toolbar{top:53px}}
-.search{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:0 14px;box-shadow:var(--shadow)}
-.search:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
-.search input{flex:1;min-width:0;border:0;background:transparent;padding:12px 0;outline:none;font-size:16px}
-.search input::-webkit-search-cancel-button{display:none}
-.search svg{color:var(--ink-3)}
-.filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.filters select{border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:6px 12px;font-size:13.5px}
-.seg{display:inline-flex;background:var(--surface-2);border-radius:99px;padding:3px}
-.seg button{border:0;background:transparent;padding:5px 14px;font-size:13.5px;border-radius:99px;color:var(--ink-2);font-weight:500}
-.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.1)}
-.tgl{display:inline-flex;align-items:center;gap:6px;font-size:13.5px;color:var(--ink-2);border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:5px 12px;cursor:pointer}
-.tgl:has(input:checked){border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
-.tgl input{display:none}
-.status{font-size:13px;color:var(--ink-3);margin:0 0 10px}
-.list{display:flex;flex-direction:column;gap:10px}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px;display:flex;gap:14px;cursor:pointer;box-shadow:var(--shadow);transition:border-color .15s,transform .15s}
-.card:hover{border-color:color-mix(in srgb,var(--accent) 45%,var(--line));transform:translateY(-1px)}
-.card .ic{flex:none;width:40px;height:40px;border-radius:12px;display:grid;place-items:center}
-.card .ic.in{background:var(--in-soft);color:var(--in)}.card .ic.out{background:var(--out-soft);color:var(--out)}
-.card .bd{min-width:0;flex:1;display:flex;flex-direction:column;gap:5px}
-.card .top{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.card .lbl{font-family:var(--mono);font-size:13px;font-weight:500;color:var(--ink-2)}
-.card .dt{margin-left:auto;color:var(--ink-3);font-size:13px}
-.card .subj{font-weight:600;font-size:15px;line-height:1.5;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
-.card .meta{font-size:13px;color:var(--ink-3);display:flex;gap:4px 14px;flex-wrap:wrap}
-.card .tags{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
-.fbtn{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;font-weight:600;padding:4px 11px;border-radius:99px;background:var(--accent);color:var(--accent-ink);text-decoration:none}
-.fbtn svg.i{width:14px;height:14px}
-.more{display:block;margin:14px auto 0}
-.mini{display:flex;gap:12px;padding:12px 16px;border-top:1px solid var(--line);cursor:pointer;align-items:flex-start}
-.mini:first-child{border-top:0}.mini:hover{background:var(--surface-2)}
-.mini .subj{font-size:14px;font-weight:500;line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.mini .note{margin-top:2px}
-
-/* ---------- events ---------- */
-.day{display:grid;grid-template-columns:64px 1fr;gap:14px;margin-bottom:16px}
-.dbox{text-align:center;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:8px 4px;height:max-content;position:sticky;top:8px}
-.dbox small{display:block;font-size:12px;color:var(--ink-3);font-weight:600}
-.dbox b{display:block;font-size:24px;line-height:1.15}
-.dbox.today{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}.dbox.today small{color:inherit;opacity:.85}
-.evs{display:flex;flex-direction:column;gap:8px;min-width:0}
-.ev{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--c);border-radius:12px;padding:11px 14px;cursor:pointer;display:flex;flex-direction:column;gap:4px;box-shadow:var(--shadow)}
-.ev:hover{border-color:var(--c)}
-.ev .r1{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.ev .tm{font-family:var(--mono);font-size:13px;color:var(--ink-2)}
-.ev .sj{font-weight:600;font-size:15px;line-height:1.45;overflow-wrap:anywhere}
-.ev .mt{display:flex;gap:4px 14px;flex-wrap:wrap;font-size:13px;color:var(--ink-3)}
-.ev .mt span{display:inline-flex;gap:4px;align-items:center}.ev .mt svg.i{width:14px;height:14px}
-.ev .nt{margin-left:auto;font-size:12px;color:var(--ink-3);display:inline-flex;gap:4px;align-items:center}
-.ev .nt svg.i{width:14px;height:14px}.ev .nt.sent{color:var(--ok)}
-.urow{display:flex;gap:12px;padding:11px 16px;border-top:1px solid var(--line);cursor:pointer;align-items:center}
-.urow:first-child{border-top:0}.urow:hover{background:var(--surface-2)}
-.urow .d{width:46px;text-align:center;flex:none}.urow .d b{display:block;font-size:19px;line-height:1.1}.urow .d small{font-size:11.5px;color:var(--ink-3)}
-.urow .bar{width:4px;align-self:stretch;border-radius:4px;background:var(--c)}
-.urow .x{min-width:0;flex:1}.urow .x b{font-weight:600;font-size:14px;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-
-/* ---------- drawer ---------- */
-.scrim{position:fixed;inset:0;background:rgba(10,14,25,.45);z-index:40;animation:fi .15s}
-.drawer{position:fixed;z-index:41;right:0;top:0;bottom:0;width:min(560px,100%);background:var(--surface);display:flex;flex-direction:column;box-shadow:-10px 0 40px rgba(0,0,0,.2);animation:si .2s ease-out}
-@keyframes fi{from{opacity:0}}@keyframes si{from{transform:translateX(30px);opacity:.4}}
-@media (max-width:640px){.drawer{top:auto;height:92vh;width:100%;border-radius:20px 20px 0 0;animation:su .22s ease-out}@keyframes su{from{transform:translateY(40px);opacity:.5}}}
-.dh{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--line)}
-.dh b{font-size:16px}
-.dh .x{margin-left:auto;border:0;background:var(--surface-2);width:34px;height:34px;border-radius:50%;display:grid;place-items:center}
-.db{overflow:auto;padding:18px;display:flex;flex-direction:column;gap:18px;flex:1}
-.df{padding:12px 18px calc(12px + env(safe-area-inset-bottom));border-top:1px solid var(--line);display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.db h2{margin:0;font-size:19px;line-height:1.45}
-dl{display:grid;grid-template-columns:118px 1fr;gap:8px 14px;margin:0;font-size:14.5px}
-dt{color:var(--ink-3);font-size:13.5px}dd{margin:0;overflow-wrap:anywhere}
-.sec h3{font-size:12.5px;letter-spacing:.04em;color:var(--ink-3);margin:0 0 8px;font-weight:600}
-.att{display:flex;flex-direction:column;gap:8px}
-.att a{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:12px;padding:11px 14px;text-decoration:none;color:var(--ink)}
-.att a:hover{border-color:var(--accent)}.att a b{flex:1;font-weight:600}
-.att .fi{width:34px;height:34px;border-radius:9px;background:var(--rose-soft);color:var(--rose);display:grid;place-items:center}
-.drop{border:2px dashed var(--line);border-radius:12px;padding:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;color:var(--ink-2);font-size:14px}
-.drop.on{border-color:var(--accent);background:var(--accent-soft)}
-.warnbox{border-radius:12px;padding:10px 14px;font-size:13.5px;background:var(--amber-soft);color:var(--amber)}
-pre.msg{white-space:pre-wrap;background:#E7F6E1;color:#13231A;border-radius:16px 16px 16px 4px;padding:14px;font-family:var(--f);font-size:14px;line-height:1.6;margin:0}
-@media (prefers-color-scheme:dark){pre.msg{background:#1F3A28;color:#E2F3E7}}
-
-/* ---------- forms ---------- */
-.form{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:14px}
-.form.card2{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow)}
-.f{display:flex;flex-direction:column;gap:5px;min-width:0}
-.f label,.f .lab{font-size:13px;color:var(--ink-2);font-weight:500}
-.f input,.f select,.f textarea{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:10px 12px;width:100%;min-width:0;font-size:15px}
-.f input:focus,.f select:focus,.f textarea:focus{outline:0;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
-.f textarea{resize:vertical}
-.c2{grid-column:span 2}.c3{grid-column:span 3}.c4{grid-column:span 4}.c6{grid-column:1/-1}
-.form h3{grid-column:1/-1;margin:6px 0 -4px;font-size:13px;color:var(--ink-3);letter-spacing:.04em;font-weight:600}
-.pills{display:flex;gap:6px;flex-wrap:wrap}
-.pills button{border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:6px 14px;font-size:13.5px;font-weight:500;color:var(--ink-2)}
-.f .seg{align-self:flex-start}
-.pills button[aria-pressed="true"]{background:var(--cs,var(--accent-soft));border-color:var(--c,var(--accent));color:var(--c,var(--accent));font-weight:600}
-.switch{display:flex;align-items:center;gap:10px;cursor:pointer;font-size:14px}
-.switch input{appearance:none;width:42px;height:24px;border-radius:99px;background:var(--line);position:relative;transition:.2s;flex:none;margin:0;cursor:pointer}
-.switch input:after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.25)}
-.switch input:checked{background:var(--accent)}.switch input:checked:after{left:21px}
-.nextbox{display:flex;gap:10px;flex-wrap:wrap}
-.nextbox div{flex:1;min-width:140px;background:var(--surface-2);border-radius:12px;padding:10px 14px}
-.nextbox small{color:var(--ink-3);font-size:12.5px}.nextbox b{display:block;font-family:var(--mono);font-size:18px}
-.done{text-align:center;padding:30px 20px}
-.done .ok{width:60px;height:60px;border-radius:50%;background:var(--in-soft);color:var(--in);display:grid;place-items:center;margin:0 auto 10px}
-.done .ok svg{width:30px;height:30px}
-.done .big{font-family:var(--mono);font-size:30px;font-weight:500;color:var(--in);margin:6px 0}
-@media (max-width:640px){.ph h1{font-size:21px}.ph .act{width:100%}.ph .act .btn{padding:7px 11px;font-size:13px}.ph .act .btn.primary{margin-left:auto}.day{grid-template-columns:52px 1fr;gap:10px}.dbox{top:62px}.dbox b{font-size:20px}.ev .nt{margin-left:0;width:100%}.form{grid-template-columns:1fr 1fr}.c2,.c3,.c4{grid-column:span 1}.wide{grid-column:1/-1}dl{grid-template-columns:96px 1fr}}
-
-/* ---------- LINE settings ---------- */
-.cards3{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
-.srow{display:flex;align-items:center;gap:12px;padding:12px 16px;border-top:1px solid var(--line)}
-.srow:first-child{border-top:0}.srow .x{flex:1;min-width:0}.srow .x small{display:block;color:var(--ink-3);font-size:12.5px}
-.sic{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;flex:none;background:var(--surface-2);color:var(--ink-2)}
-.sic.ok{background:var(--in-soft);color:var(--ok)}.sic.bad{background:var(--rose-soft);color:var(--crit)}
-.meter{height:10px;border-radius:99px;background:var(--surface-2);overflow:hidden;margin:8px 0 4px}
-.meter i{display:block;height:100%;background:var(--accent);border-radius:99px}
-.copy{display:flex;gap:8px}.copy input{flex:1;min-width:0;border:1px solid var(--line);background:var(--surface-2);border-radius:10px;padding:8px 10px;font-size:13px;font-family:var(--mono)}
+.fab{position:fixed;right:14px;bottom:calc(84px + env(safe-area-inset-bottom));z-index:5;width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--surface);box-shadow:0 4px 14px rgba(0,0,0,.15);display:grid;place-items:center;cursor:pointer;color:var(--ink-2)}
+@media (min-width:901px){.fab{bottom:18px}}
+.menu{position:fixed;right:14px;bottom:calc(132px + env(safe-area-inset-bottom));z-index:6;background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.18);padding:6px;min-width:230px}
+@media (min-width:901px){.menu{bottom:66px}}
+.menu button,.menu a{display:flex;gap:10px;align-items:center;width:100%;border:0;background:none;padding:10px 12px;border-radius:9px;font-size:14px;color:var(--ink);text-decoration:none;cursor:pointer;text-align:left}
+.menu button:hover,.menu a:hover{background:var(--soft)}
+.menu .danger{color:var(--crit)}
+svg.i{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex:none}
 </style>
 </head>
 <body>
-<div class="app">
-  <aside class="side">
-    <div class="logo"><div class="mk">สบ</div><div><b>สารบรรณออนไลน์</b><small>สาขาวิชาประสาทวิทยา</small></div></div>
-    <nav class="nav" id="sideNav"></nav>
-    <div class="foot"><span class="role" id="roleSide"></span><div style="margin-top:8px" id="sideNote"></div></div>
-  </aside>
-  <div>
-    <div class="topbar"><div class="mk">สบ</div><b>สารบรรณออนไลน์</b><span class="role" id="roleTop"></span></div>
-    <main class="main" id="view"></main>
+<!-- หน้าเข้าใช้งาน (แสดงครั้งแรกในแต่ละเครื่อง) -->
+<main class="gate" id="gate" hidden>
+  <div class="card">
+    <div class="top"><div class="mk">สบ</div><h1>สารบรรณออนไลน์</h1><p>สาขาวิชาประสาทวิทยา · ค้นหาหนังสือ งาน และแจ้งเตือน</p></div>
+    <form class="body" id="form" autocomplete="off">
+      <div><label class="l" for="code">วางลิงก์ที่ได้รับจากผู้ดูแล หรือรหัสเข้าใช้</label>
+        <input class="inp" id="code" placeholder="https://script.google.com/…/exec?k=… หรือ รหัส 12 ตัว" spellcheck="false" autocapitalize="off" autofocus></div>
+      <label class="chk"><input type="checkbox" id="remember" checked> จำไว้ในเครื่องนี้ ครั้งหน้าเปิดได้ทันที</label>
+      <div class="err" id="err" role="alert"></div>
+      <button class="btn" type="submit">เข้าใช้งาน</button>
+      <div class="hint">ระบบจะเปิดหน้าตามสิทธิ์ของลิงก์: ผู้ดูแลจัดการได้ทั้งหมด · ผู้ดูค้นหาและอ่านได้อย่างเดียว<br>ไม่มีลิงก์? ติดต่อผู้ดูแลระบบของสาขาวิชา</div>
+    </form>
+  </div>
+</main>
+
+<!-- หน้าแอป -->
+<div class="app" id="app" hidden>
+  <div class="loading" id="loading"><div><div class="spin"></div>กำลังเปิดสารบรรณออนไลน์…</div></div>
+  <iframe id="frame" title="สารบรรณออนไลน์" allow="clipboard-write" referrerpolicy="no-referrer"></iframe>
+  <button class="fab" id="fab" aria-label="เมนู" aria-expanded="false"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="12" cy="19" r="1.4"/></svg></button>
+  <div class="menu" id="menu" hidden>
+    <a id="newTab" target="_blank" rel="noopener"><svg class="i" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M19 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"/></svg>เปิดในแท็บใหม่ (เต็มจอ)</a>
+    <button id="reload"><svg class="i" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>โหลดใหม่</button>
+    <button id="logout" class="danger"><svg class="i" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>ออกจากระบบในเครื่องนี้</button>
   </div>
 </div>
-<nav class="bnav" id="bNav"></nav>
-<div id="drawerHost"></div><div id="toastHost"></div>
-<script type="application/json" id="bootData"><?!= boot ?></script>
+
 <script>
-/* ค่าเริ่มต้นจาก Apps Script (ถ้าเปิดไฟล์นี้นอก Apps Script จะเข้าโหมดพรีวิว ไม่ error) */
-const BOOT_IN = (() => { try { return JSON.parse(document.getElementById('bootData').textContent); } catch (e) { return null; } })();
-const PREVIEW = !BOOT_IN || typeof google === 'undefined' || !google.script;
-const BOOT = BOOT_IN || { k: '', q: '', role: 'admin' };
-const K = BOOT.k, ADMIN = BOOT.role === 'admin';
-const TYPES = ['คุมสอบ', 'สอน', 'ประชุม', 'ประกาศ', 'อื่นๆ'];
-const TH_M = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
-const TH_D = ['อา.','จ.','อ.','พ.','พฤ.','ศ.','ส.'];
-const $ = s => document.querySelector(s);
-const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const thD = s => String(s || '').replace(/[๐-๙]/g, d => '๐๑๒๓๔๕๖๗๘๙'.indexOf(d));
-const P = {
-  home:'<path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
-  file:'<path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h5"/>',
-  cal:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/>',
-  plus:'<path d="M12 5v14M5 12h14"/>',
-  chat:'<path d="M21 11.5a8.4 8.4 0 0 1-9 8.5 9 9 0 0 1-4-1L3 20l1.5-4A8.5 8.5 0 1 1 21 11.5z"/>',
-  search:'<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',
-  x:'<path d="M18 6 6 18M6 6l12 12"/>',
-  clip:'<path d="m21.4 11.1-9.2 9.2a6 6 0 0 1-8.5-8.5l9.2-9.2a4 4 0 0 1 5.7 5.7l-9.2 9.2a2 2 0 0 1-2.8-2.8l8.5-8.5"/>',
-  edit:'<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>',
-  trash:'<path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/>',
-  mega:'<path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/>',
-  eye:'<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
-  inbox:'<path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.5 5h13L22 12v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-6z"/>',
-  send:'<path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/>',
-  pin:'<path d="M12 21s-7-6-7-11a7 7 0 0 1 14 0c0 5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/>',
-  user:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
-  clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
-  check:'<path d="M20 6 9 17l-5-5"/>',
-  copy:'<rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/>',
-  upload:'<path d="M12 16V4M7 9l5-5 5 5M4 20h16"/>',
-  bell:'<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"/>',
-  ext:'<path d="M14 4h6v6M20 4l-9 9M19 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"/>',
-  key:'<circle cx="7.5" cy="15.5" r="4.5"/><path d="m10.7 12.3 9.8-9.8M17 6l3 3M15 8l2 2"/>',
-  users:'<circle cx="9" cy="8" r="3.5"/><path d="M2 20a7 7 0 0 1 14 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M22 20a7 7 0 0 0-4-6.3"/>',
-  link:'<path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/>'
+const KEY = 'saraban.link';
+const $ = s => document.getElementById(s);
+const store = {
+  get() { try { return localStorage.getItem(KEY) || sessionStorage.getItem(KEY) || ''; } catch (e) { return ''; } },
+  set(v, remember) { try { (remember ? localStorage : sessionStorage).setItem(KEY, v); } catch (e) {} },
+  clear() { try { localStorage.removeItem(KEY); sessionStorage.removeItem(KEY); } catch (e) {} }
 };
-const ic = (n, cls) => `<svg class="i ${cls || ''}" viewBox="0 0 24 24" aria-hidden="true">${P[n]}</svg>`;
-function run(fn, ...args) {
-  if (PREVIEW) return Promise.reject(new Error('โหมดพรีวิว — ต้องเปิดจากลิงก์เว็บแอปใน Apps Script'));
-  return new Promise((ok, no) => google.script.run.withSuccessHandler(ok).withFailureHandler(e => no(e))[fn](...args));
+/** รับได้ทั้ง ลิงก์เต็ม (…/exec?k=xxx) หรือ รหัสอย่างเดียว (ต้องตั้ง APP_URL) */
+function toLink(input) {
+  const t = String(input || '').trim();
+  if (!t) return '';
+  const m = t.match(/^(https:\/\/script\.google(?:usercontent)?\.com\/[^\s?#]+\/exec)\?(?:[^#\s]*&)?k=([A-Za-z0-9]+)/);
+  if (m) return m[1] + '?k=' + m[2];
+  if (/^[A-Za-z0-9]{6,40}$/.test(t) && APP_URL) return APP_URL.replace(/\?.*$/, '') + '?k=' + t;
+  return '';
 }
-function toast(m) { $('#toastHost').innerHTML = '<div class="toast" role="status">' + esc(m) + '</div>'; clearTimeout(toast.t); toast.t = setTimeout(() => $('#toastHost').innerHTML = '', 3500); }
-const errMsg = e => (e && e.message) || String(e);
-const iso = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
-const pd = s => { const p = s.split('-').map(Number); return new Date(p[0], p[1] - 1, p[2]); };
-const thShort = s => { const d = pd(s); return TH_D[d.getDay()] + ' ' + d.getDate() + ' ' + TH_M[d.getMonth()]; };
-const thLong = s => { const d = pd(s); return thShort(s) + ' ' + (d.getFullYear() + 543); };
-const addD = (s, n) => iso(new Date(pd(s).getTime() + n * 864e5));
-
-/* ======================= state & navigation ======================= */
-const S = { meta: null, home: null, view: 'home', q: BOOT.q || '', year: '', dir: '', att: false, limit: 30, items: [], total: 0, seq: 0, evScope: 'upcoming', events: [] };
-const NAV = [
-  { id: 'home', label: 'ภาพรวม', icon: 'home' },
-  { id: 'letters', label: 'หนังสือ', icon: 'file' },
-  { id: 'events', label: 'งาน & แจ้งเตือน', short: 'งาน', icon: 'cal' },
-  { id: 'new', label: 'ลงทะเบียน', icon: 'plus', admin: true },
-  { id: 'line', label: 'ตั้งค่า LINE', short: 'LINE', icon: 'chat', admin: true }
-].filter(n => ADMIN || !n.admin);
-function renderNav() {
-  const b = n => `<button data-nav="${n.id}" ${S.view === n.id ? 'aria-current="page"' : ''}>${ic(n.icon)}<span>${n.label}</span></button>`;
-  $('#sideNav').innerHTML = NAV.map(b).join('');
-  $('#bNav').innerHTML = NAV.map(n => `<button data-nav="${n.id}" ${S.view === n.id ? 'aria-current="page"' : ''}>${ic(n.icon)}<span>${n.short || n.label}</span></button>`).join('');
-  const r = ADMIN ? `<span class="role admin">${ic('key')} ผู้ดูแล</span>` : `<span class="role">${ic('eye')} ดูอย่างเดียว</span>`;
-  $('#roleSide').outerHTML = r.replace('class="role', 'id="roleSide" class="role'); $('#roleTop').outerHTML = r.replace('class="role', 'id="roleTop" class="role');
-  $('#sideNote').textContent = ADMIN ? 'ลงทะเบียน แนบไฟล์ และจัดการแจ้งเตือนได้' : 'ค้นหาและเปิดอ่านได้ แก้ไขไม่ได้';
+function openApp(link) {
+  $('gate').hidden = true; $('app').hidden = false;
+  $('newTab').href = link;
+  $('frame').onload = () => { $('loading').hidden = true; };
+  $('frame').src = link;
 }
-function go(v, opt) {
-  if (!NAV.some(n => n.id === v)) v = 'home';
-  S.view = v; renderNav(); closeDrawer(); window.scrollTo(0, 0);
-  ({ home: viewHome, letters: viewLetters, events: viewEvents, new: viewNew, line: viewLine })[v](opt || {});
+function showGate(msg) {
+  $('app').hidden = true; $('gate').hidden = false; $('err').textContent = msg || '';
+  $('code').focus();
 }
-document.addEventListener('click', e => {
-  const n = e.target.closest('[data-nav]'); if (n) { e.preventDefault(); go(n.dataset.nav); return; }
-  if (e.target.closest('[data-close]')) { closeDrawer(); return; }
-});
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') closeDrawer();
-  if (e.key === 'Enter' && e.target.matches && e.target.matches('[data-open]')) e.target.click();
-});
-
-/* ======================= drawer ======================= */
-function openDrawer(title, body, foot) {
-  $('#drawerHost').innerHTML = `<div class="scrim" data-close></div><aside class="drawer" role="dialog" aria-modal="true" aria-label="${esc(title)}">
-    <div class="dh"><b>${title}</b><button class="x" data-close aria-label="ปิด">${ic('x')}</button></div>
-    <div class="db">${body}</div>${foot ? `<div class="df">${foot}</div>` : ''}</aside>`;
-}
-function closeDrawer() { $('#drawerHost').innerHTML = ''; }
-
-/* ======================= helpers: letters ======================= */
-function hl(t) {
-  const s = esc(t); const terms = thD(S.q).toLowerCase().split(/\s+/).filter(x => x.length > 1).map(x => esc(x).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
-  if (!terms.length) return s; try { return s.replace(new RegExp('(' + terms.join('|') + ')', 'gi'), '<mark>$1</mark>'); } catch (e) { return s; }
-}
-const fileBtns = it => it.files.map((u, i) => `<a class="fbtn" href="${esc(u)}" rel="noopener" onclick="event.stopPropagation()">${ic('clip')} ${it.files.length > 1 ? 'ไฟล์ ' + (i + 1) : 'เปิดหนังสือ'}</a>`).join('');
-function letterCard(it, i) {
-  const out = it.dir === 'ส่ง';
-  const tags = [it.cat && `<span class="chip">${esc(it.cat)}</span>`, it.urg && it.urg !== 'ปกติ' && `<span class="chip warn">${esc(it.urg)}</span>`, it.sec && it.sec !== 'ปกติ' && `<span class="chip crit">${esc(it.sec)}</span>`].filter(Boolean).join('');
-  return `<article class="card" data-open data-i="${i}" tabindex="0">
-    <div class="ic ${out ? 'out' : 'in'}">${ic(out ? 'send' : 'inbox')}</div>
-    <div class="bd"><div class="top"><span class="chip ${out ? 'out' : 'in'}">${out ? 'ส่ง' : 'รับ'}</span><span class="lbl">${hl(it.label || 'ไม่มีเลข')}</span><span class="dt">${esc(it.dateTH)}</span></div>
-    <div class="subj">${hl(it.subject)}</div>
-    <div class="meta"><span>ที่ ${hl(it.book || '—')}</span><span>${hl(out ? 'ถึง ' + (it.to || '—') : 'จาก ' + (it.from || '—'))}</span>${it.owner ? `<span>${hl(it.owner)}</span>` : ''}</div>
-    ${tags || it.files.length ? `<div class="tags">${tags}${fileBtns(it)}</div>` : ''}</div></article>`;
-}
-function miniLetter(it, i) {
-  const out = it.dir === 'ส่ง';
-  return `<div class="mini" data-open data-ri="${i}" tabindex="0"><span class="chip ${out ? 'out' : 'in'}">${out ? 'ส่ง' : 'รับ'}</span>
-    <div style="min-width:0;flex:1"><div class="subj">${esc(it.subject)}</div><div class="note"><span class="mono">${esc(it.label || '—')}</span> · ${esc(it.dateTH)}</div></div>
-    ${it.files.length ? `<span style="color:var(--ink-3)">${ic('clip')}</span>` : ''}</div>`;
-}
-function openLetter(it) {
-  const out = it.dir === 'ส่ง';
-  const row = (k, v) => v ? `<dt>${k}</dt><dd>${esc(v)}</dd>` : '';
-  const loc = [it.room, it.cab && 'ตู้ ' + it.cab, it.shelf && 'ชั้น ' + it.shelf, it.folder && 'แฟ้ม ' + it.folder].filter(Boolean).join(' · ');
-  const files = it.files.map((u, i) => `<a href="${esc(u)}" rel="noopener"><span class="fi">${ic('file')}</span><b>ไฟล์ที่ ${i + 1}</b><span class="note">เปิดใน Drive</span>${ic('ext')}</a>`).join('');
-  openDrawer(`<span class="chip ${out ? 'out' : 'in'}">${out ? 'หนังสือส่ง' : 'หนังสือรับ'}</span> <span class="mono" style="margin-left:6px">${esc(it.label || '')}</span>`,
-    `<h2>${esc(it.subject)}</h2>
-    <dl>${row('ที่', it.book)}${row('ลงวันที่', it.dateTH)}${row('หนังสือ ลว.', it.dir === 'รับ' ? it.lw : '')}${row('จาก', it.from)}${row('ถึง / เรียน', it.to)}${row('หมวดเรื่อง', it.cat)}${row('ผู้รับผิดชอบ', it.owner)}${row('ผู้ดำเนินการ', it.doer)}${row('วัตถุประสงค์', it.purpose)}${row('สถานที่จัดงาน', it.venue)}${row('วันที่จัด', [it.d1, it.d2 && it.d2 !== it.d1 ? it.d2 : ''].filter(Boolean).join(' – '))}${row('ที่เก็บตัวจริง', loc)}${row('หมายเหตุ', it.note)}</dl>
-    ${ADMIN && it.chk ? `<div class="warnbox"><b>ควรตรวจสอบ:</b> ${esc(it.chk)}</div>` : ''}
-    <div class="sec"><h3>เอกสารแนบ</h3><div class="att">${files || '<span class="note">ยังไม่มีไฟล์แนบ' + (ADMIN && it.old ? ' · ไฟล์เดิมเคยอยู่ที่ ' + esc(it.old) : '') + '</span>'}</div>
-      ${ADMIN ? `<label class="drop" id="upDrop" style="margin-top:10px">${ic('upload')}<span style="flex:1">เลือกไฟล์ / ลากมาวาง เพื่อแนบเพิ่ม</span><input id="upFiles" type="file" multiple accept="application/pdf,image/*,.doc,.docx,.xls,.xlsx" hidden></label>` : (files ? '<p class="note" style="margin:8px 0 0">เปิดไฟล์ไม่ได้? เข้าสู่ระบบ Google ด้วยอีเมลที่ผู้ดูแลเพิ่มให้</p>' : '')}</div>
-    ${ADMIN ? `<p class="note" style="margin:0">แถวที่ ${it.row} ในชีต${S.meta && S.meta.sheetUrl ? ` · <a href="${esc(S.meta.sheetUrl + '&range=A' + it.row)}">เปิดแถวในชีต</a>` : ''}${it.src ? '<br>ที่มา: ' + esc(it.src) : ''}</p>` : ''}`);
-  if (!ADMIN) return;
-  const inp = $('#upFiles'), drop = $('#upDrop');
-  const up = async fs => {
-    if (!fs.length) return;
-    drop.innerHTML = '<span class="spin"></span> กำลังอัปโหลด ' + fs.length + ' ไฟล์…';
-    try { const rec = await run('api_attach', K, it.row, await readFiles(fs)); Object.assign(it, rec); toast('แนบไฟล์แล้ว'); openLetter(it); if (S.view === 'letters') renderLetters(); }
-    catch (e) { toast('อัปโหลดไม่สำเร็จ: ' + errMsg(e)); openLetter(it); }
-  };
-  inp.onchange = () => up([...inp.files]);
-  drop.ondragover = e => { e.preventDefault(); drop.classList.add('on'); };
-  drop.ondragleave = () => drop.classList.remove('on');
-  drop.ondrop = e => { e.preventDefault(); up([...e.dataTransfer.files]); };
-}
-function readFiles(fs) {
-  return Promise.all(fs.map(f => new Promise((ok, no) => {
-    if (f.size > 40 * 1024 * 1024) { no(new Error(f.name + ' ใหญ่เกิน 40 MB')); return; }
-    const r = new FileReader(); r.onload = () => ok({ name: f.name, mime: f.type, data: String(r.result).split(',')[1] }); r.onerror = () => no(r.error); r.readAsDataURL(f);
-  })));
-}
-
-/* ======================= helpers: events ======================= */
-function leadOf(ev) { return ev.lead === '' || ev.lead === null || ev.lead === undefined ? (ev.type === 'ประกาศ' ? 0 : 1) : Number(ev.lead); }
-function notifyText(ev) {
-  if (/ล่วงหน้า ✓|วันงาน ✓/.test(ev.log || '')) return `<span class="nt sent">${ic('check')} แจ้งแล้ว</span>`;
-  const l = leadOf(ev); const d = addD(ev.date, -l);
-  return `<span class="nt">${ic('bell')} ${l === 0 ? 'แจ้งเช้าวันงาน' : 'แจ้ง ' + thShort(d)}${ev.tick && l > 0 ? ' + วันงาน' : ''}</span>`;
-}
-function evCard(ev, i) {
-  return `<div class="ev t-${esc(ev.type)}" data-open data-ei="${i}" tabindex="0">
-    <div class="r1"><span class="chip type">${esc(ev.type || 'อื่นๆ')}</span>${ev.time ? `<span class="tm">${esc(ev.time)} น.</span>` : ''}${notifyText(ev)}</div>
-    <div class="sj">${esc(ev.subj)}</div>
-    ${ev.place || ev.owner ? `<div class="mt">${ev.place ? `<span>${ic('pin')}${esc(ev.place)}</span>` : ''}${ev.owner ? `<span>${ic('user')}${esc(ev.owner)}</span>` : ''}</div>` : ''}</div>`;
-}
-function upRow(ev, i) {
-  const d = pd(ev.date);
-  return `<div class="urow t-${esc(ev.type)}" data-open data-ui="${i}" tabindex="0"><div class="d"><small>${TH_D[d.getDay()]}</small><b>${d.getDate()}</b><small>${TH_M[d.getMonth()]}</small></div><span class="bar"></span>
-    <div class="x"><b>${esc(ev.subj)}</b><span class="note">${esc([ev.type, ev.time && ev.time + ' น.', ev.place].filter(Boolean).join(' · '))}</span></div></div>`;
-}
-function openEvent(ev) {
-  if (!ADMIN) {
-    const row = (k, v) => v ? `<dt>${k}</dt><dd>${esc(v)}</dd>` : '';
-    openDrawer(`<span class="chip type t-${esc(ev.type)}">${esc(ev.type || 'งาน')}</span>`,
-      `<h2>${esc(ev.subj)}</h2><dl>${row('วันที่', thLong(ev.date))}${row('เวลา', ev.time && ev.time + ' น.')}${row('สถานที่', ev.place)}${row('ผู้รับผิดชอบ', ev.owner)}${row('รายละเอียด', ev.detail)}</dl>`);
+$('form').onsubmit = e => {
+  e.preventDefault();
+  const link = toLink($('code').value);
+  if (!link) {
+    $('err').textContent = APP_URL ? 'ลิงก์หรือรหัสไม่ถูกต้อง — คัดลอกจากผู้ดูแลอีกครั้ง' : 'กรุณาวางลิงก์เต็มที่ขึ้นต้นด้วย https://script.google.com/ และมี ?k=';
     return;
   }
-  eventForm(ev);
-}
-function eventForm(ev) {
-  ev = ev || { date: iso(new Date(Date.now() + 864e5)), type: 'คุมสอบ', lead: '', tick: false };
-  const names = (S.meta && S.meta.names) || [];
-  const leadSel = ev.lead === '' || ev.lead === null || ev.lead === undefined ? '' : String(ev.lead);
-  openDrawer(ev.row ? 'แก้ไขงาน' : 'เพิ่มงาน / แจ้งเตือน',
-    `<form class="form" id="evForm" novalidate>
-      <div class="f c6"><span class="lab">ประเภท</span><div class="pills" id="evType">${TYPES.map(t => `<button type="button" class="t-${t}" data-t="${t}" aria-pressed="${ev.type === t}">${t}</button>`).join('')}</div></div>
-      <div class="f c6"><label for="evSubj">เรื่อง / วิชา *</label><input id="evSubj" value="${esc(ev.subj || '')}" placeholder="เช่น สอบ MCQ Neuro ปี 4"></div>
-      <div class="f c3 wide"><label for="evDate">วันที่ *</label><input id="evDate" type="date" value="${esc(ev.date)}"></div>
-      <div class="f c3 wide"><label for="evTime">เวลา</label><input id="evTime" value="${esc(ev.time || '')}" placeholder="08.00–11.00" list="tmList"><datalist id="tmList"><option value="08.00–11.00"><option value="08.00–12.00"><option value="09.00–12.00"><option value="13.00–16.00"><option value="12.00–13.00"></datalist></div>
-      <div class="f c3 wide"><label for="evPlace">สถานที่</label><input id="evPlace" value="${esc(ev.place || '')}" placeholder="ห้อง 618"></div>
-      <div class="f c3 wide"><label for="evOwner">ผู้รับผิดชอบ</label><input id="evOwner" value="${esc(ev.owner || '')}" list="evNames"><datalist id="evNames">${names.map(x => `<option value="${esc(x)}">`).join('')}</datalist></div>
-      <div class="f c6"><label for="evDetail">รายละเอียด</label><textarea id="evDetail" rows="2">${esc(ev.detail || '')}</textarea></div>
-      <h3>แจ้งเตือนเข้า LINE</h3>
-      <div class="f c3 wide"><label for="evLead">แจ้งเมื่อไร</label><select id="evLead">
-        <option value="" ${leadSel === '' ? 'selected' : ''}>ค่าเริ่มต้น (1 วันก่อน)</option>
-        ${[[0, 'เช้าวันงาน'], [1, 'ล่วงหน้า 1 วัน'], [2, 'ล่วงหน้า 2 วัน'], [3, 'ล่วงหน้า 3 วัน'], [7, 'ล่วงหน้า 7 วัน']].map(([v, l]) => `<option value="${v}" ${leadSel === String(v) ? 'selected' : ''}>${l}</option>`).join('')}</select></div>
-      <div class="f c3 wide" style="justify-content:flex-end"><label class="switch"><input type="checkbox" id="evTick" ${ev.tick ? 'checked' : ''}> แจ้งซ้ำเช้าวันงานด้วย</label></div>
-      <p class="note c6" id="evWhen" style="margin:0"></p>
-      ${ev.log ? `<p class="note c6" style="margin:0">ประวัติการส่ง: ${esc(ev.log)}</p>` : ''}
-      <p class="note c6" id="evMsg" role="alert" style="margin:0;color:var(--crit)"></p>
-    </form>`,
-    `<button class="btn primary" id="evSave">${ic('check')} บันทึก</button>${ev.row ? `<button class="btn danger" id="evDel" style="margin-left:auto">${ic('trash')} ลบ</button>` : ''}`);
-  let type = ev.type || 'คุมสอบ';
-  const when = () => {
-    const d = $('#evDate').value; if (!d) { $('#evWhen').textContent = ''; return; }
-    const l = leadOf({ lead: $('#evLead').value, type });
-    const parts = [l === 0 ? 'เช้าวันงาน ' + thLong(d) : 'เช้า ' + thLong(addD(d, -l))];
-    if ($('#evTick').checked && l > 0) parts.push('และเช้าวันงาน ' + thShort(d));
-    $('#evWhen').innerHTML = ic('bell') + ' ระบบจะส่งแจ้งเตือน ' + parts.join(' ');
-  };
-  when();
-  $('#evType').onclick = e => { const b = e.target.closest('button'); if (!b) return; type = b.dataset.t; $('#evType').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b)); when(); };
-  ['#evDate', '#evLead', '#evTick'].forEach(s => $(s).onchange = when);
-  $('#evSave').onclick = async () => {
-    const v = s => $(s).value.trim();
-    if (!v('#evSubj')) { $('#evMsg').textContent = 'กรุณากรอกเรื่อง'; $('#evSubj').focus(); return; }
-    if (!v('#evDate')) { $('#evMsg').textContent = 'กรุณาเลือกวันที่'; return; }
-    const b = $('#evSave'); b.disabled = true; b.innerHTML = '<span class="spin"></span> กำลังบันทึก…';
-    try {
-      await run('api_eventSave', K, { row: ev.row || 0, date: v('#evDate'), time: v('#evTime'), type, subj: v('#evSubj'), place: v('#evPlace'), owner: v('#evOwner'), detail: v('#evDetail'), lead: $('#evLead').value, tick: $('#evTick').checked });
-      toast('บันทึกแล้ว'); closeDrawer(); refreshEvents();
-    } catch (e) { $('#evMsg').textContent = errMsg(e); b.disabled = false; b.innerHTML = ic('check') + ' บันทึก'; }
-  };
-  if (ev.row) $('#evDel').onclick = async () => {
-    if (!confirm('ลบงาน "' + ev.subj + '" ?')) return;
-    try { await run('api_eventDelete', K, ev.row); toast('ลบแล้ว'); closeDrawer(); refreshEvents(); } catch (e) { toast(errMsg(e)); }
-  };
-}
-function refreshEvents() { if (S.view === 'events') loadEvents(); else if (S.view === 'home') loadHome(); }
-function announceDrawer() {
-  openDrawer('ส่งประกาศเข้า LINE',
-    `<p class="note" style="margin:0">ข้อความจะขึ้นต้นด้วย “📣 ประกาศ สาขาวิชาประสาทวิทยา” และส่งถึงผู้รับแจ้งเตือนทุกปลายทางทันที</p>
-     <div class="f"><label for="anText">ข้อความ</label><textarea id="anText" rows="7" placeholder="เช่น พรุ่งนี้ประชุมสาขา 12.00 น. ห้อง 618 งดคลินิกบ่าย"></textarea></div>
-     <div class="sec"><h3>ตัวอย่าง</h3><pre class="msg" id="anPrev">📣 ประกาศ สาขาวิชาประสาทวิทยา\n\n…</pre></div>`,
-    `<button class="btn primary" id="anSend">${ic('send')} ส่งเลย</button><span class="note" id="anMsg"></span>`);
-  $('#anText').oninput = () => { $('#anPrev').textContent = '📣 ประกาศ สาขาวิชาประสาทวิทยา\n\n' + ($('#anText').value || '…'); };
-  $('#anText').focus();
-  $('#anSend').onclick = async () => {
-    const t = $('#anText').value.trim(); if (!t) { $('#anText').focus(); return; }
-    const b = $('#anSend'); b.disabled = true; b.innerHTML = '<span class="spin"></span> กำลังส่ง…';
-    try { toast(await run('api_announce', K, t)); closeDrawer(); }
-    catch (e) { $('#anMsg').textContent = errMsg(e); b.disabled = false; b.innerHTML = ic('send') + ' ส่งเลย'; }
-  };
-}
-async function previewDrawer() {
-  openDrawer('ตัวอย่างข้อความเช้าพรุ่งนี้', '<div class="sk" style="height:180px"></div>');
-  try {
-    const r = await run('api_remindPreview', K);
-    openDrawer('ตัวอย่างข้อความเช้าพรุ่งนี้', `<p class="note" style="margin:0">จะส่งเช้า ${esc(r.dateTH)} ประมาณ ${r.hour}:00 น. (ยังไม่ได้ส่งจริง)</p>
-      ${r.text ? `<pre class="msg">${esc(r.text)}</pre>` : `<div class="empty">${ic('bell')}พรุ่งนี้ไม่มีรายการที่ต้องแจ้ง</div>`}`,
-      `<button class="btn" id="sendNow">${ic('send')} ส่งรอบวันนี้ทันที</button><span class="note">ส่งเฉพาะรายการที่ถึงกำหนดวันนี้และยังไม่เคยส่ง</span>`);
-    $('#sendNow').onclick = sendNow;
-  } catch (e) { openDrawer('ตัวอย่างข้อความ', `<div class="warnbox">${esc(errMsg(e))}</div>`); }
-}
-async function sendNow() {
-  if (!confirm('ส่งแจ้งเตือนรอบวันนี้เข้า LINE ทันที?')) return;
-  try { toast(await run('api_remindNow', K)); refreshEvents(); } catch (e) { toast(errMsg(e)); }
-}
+  store.set(link, $('remember').checked);
+  openApp(link);
+};
+$('fab').onclick = () => { const m = $('menu'); m.hidden = !m.hidden; $('fab').setAttribute('aria-expanded', !m.hidden); };
+$('reload').onclick = () => { $('menu').hidden = true; $('loading').hidden = false; $('frame').src = $('frame').src; };
+$('logout').onclick = () => { if (!confirm('ออกจากระบบในเครื่องนี้? ครั้งหน้าต้องวางลิงก์ใหม่')) return; store.clear(); $('frame').src = 'about:blank'; $('menu').hidden = true; $('code').value = ''; showGate(); };
+document.addEventListener('click', e => { if (!e.target.closest('#menu,#fab')) $('menu').hidden = true; });
 
-/* ======================= VIEW: home ======================= */
-function viewHome() {
-  const h = new Date().getHours();
-  $('#view').innerHTML = `
-    <section class="hero"><small id="hDate">${thLong(iso(new Date()))}</small><h1>${h < 12 ? 'สวัสดีตอนเช้า' : h < 17 ? 'สวัสดีตอนบ่าย' : 'สวัสดีตอนเย็น'} — ค้นหาหนังสือได้เลย</h1>
-      <form class="hsearch" id="hForm">${ic('search')}<input id="hq" type="search" placeholder="เรื่อง / ชื่อคน / เลขที่หนังสือ / ร 61/2569" autocomplete="off"><button class="btn sm" type="submit">ค้นหา</button></form>
-      ${ADMIN ? `<div class="qa"><button data-nav="new">${ic('plus')} ลงทะเบียนหนังสือ</button><button id="qaEv">${ic('cal')} เพิ่มงาน/แจ้งเตือน</button><button id="qaAn">${ic('mega')} ส่งประกาศ</button></div>` : ''}</section>
-    <div id="hAlert"></div>
-    <div class="stats" id="hStats">${[1, 2, 3, 4].map(() => '<div class="panel stat"><div class="sk" style="width:60%"></div><div class="sk" style="height:26px;margin-top:8px;width:40%"></div></div>').join('')}</div>
-    <div class="grid2">
-      <section class="panel"><h2>${ic('cal')} งานที่กำลังมาถึง <button class="link" data-nav="events">ดูทั้งหมด</button></h2><div id="hEv"><div class="pb"><div class="sk"></div><div class="sk" style="margin-top:10px;width:70%"></div></div></div></section>
-      <section class="panel"><h2>${ic('file')} หนังสือล่าสุด <button class="link" data-nav="letters">ดูทั้งหมด</button></h2><div id="hRec"><div class="pb"><div class="sk"></div><div class="sk" style="margin-top:10px;width:70%"></div></div></div></section>
-    </div>`;
-  $('#hForm').onsubmit = e => { e.preventDefault(); S.q = $('#hq').value.trim(); S.year = ''; go('letters'); };
-  if (ADMIN) { $('#qaEv').onclick = () => eventForm(); $('#qaAn').onclick = announceDrawer; }
-  loadHome();
-}
-async function loadHome() {
-  try {
-    const d = S.home = await run('api_home', K);
-    if (S.view !== 'home') return;
-    const st = (label, v, c) => `<div class="panel stat"><small><span class="dot" style="--c:${c}"></span>${label}</small><b>${Number(v).toLocaleString()}</b></div>`;
-    $('#hStats').innerHTML = st('หนังสือทั้งหมด', d.total, 'var(--accent)') + st('รับ ปี ' + d.year, d.inYear, 'var(--in)') + st('ส่ง ปี ' + d.year, d.outYear, 'var(--out)') + st('มีไฟล์แนบ', d.withFile, 'var(--rose)');
-    $('#hEv').innerHTML = d.upcoming.length ? d.upcoming.map(upRow).join('') : `<div class="empty">${ic('cal')}ไม่มีงานใน 14 วันข้างหน้า${ADMIN ? '<br><button class="btn sm" id="hAdd" style="margin-top:10px">' + ic('plus') + ' เพิ่มงาน</button>' : ''}</div>`;
-    $('#hRec').innerHTML = d.recent.map(miniLetter).join('') || '<div class="empty">ยังไม่มีหนังสือ</div>';
-    $('#hEv').onclick = e => { const r = e.target.closest('[data-ui]'); if (r) openEvent(d.upcoming[+r.dataset.ui]); if (e.target.closest('#hAdd')) eventForm(); };
-    $('#hRec').onclick = e => { const r = e.target.closest('[data-ri]'); if (r) openLetter(d.recent[+r.dataset.ri]); };
-    if (ADMIN && d.line && (!d.line.token || !d.line.recipients || !d.line.auto)) {
-      const miss = !d.line.token ? 'ยังไม่ได้เชื่อม LINE OA' : !d.line.recipients ? 'ยังไม่ได้เพิ่มผู้รับแจ้งเตือน' : 'แจ้งเตือนอัตโนมัติยังปิดอยู่';
-      $('#hAlert').innerHTML = `<div class="alert">${ic('bell')}<span><b>${miss}</b> — งานในตารางจะยังไม่ถูกส่งเข้า LINE</span><button class="btn sm" data-nav="line">ตั้งค่า</button></div>`;
-    }
-  } catch (e) { $('#hStats').innerHTML = `<div class="warnbox" style="grid-column:1/-1">เชื่อมต่อไม่ได้: ${esc(errMsg(e))}</div>`; }
-}
-
-/* ======================= VIEW: letters ======================= */
-function viewLetters() {
-  const years = (S.meta && S.meta.years) || [];
-  $('#view').innerHTML = `
-    <div class="ph"><div><h1>หนังสือรับ–ส่ง</h1><p>ค้นได้ทั้งเรื่อง ชื่อคน หน่วยงาน เลขที่หนังสือ หรือเลขทะเบียน เช่น ร 61/2569</p></div>
-      ${ADMIN ? `<div class="act"><button class="btn primary" data-nav="new">${ic('plus')} ลงทะเบียน</button></div>` : ''}</div>
-    <div class="toolbar"><label class="search">${ic('search')}<input id="q" type="search" placeholder="พิมพ์คำค้น…" autocomplete="off" value="${esc(S.q)}"></label>
-      <div class="filters"><select id="year" aria-label="ปี พ.ศ."><option value="">ทุกปี</option>${years.map(y => `<option ${S.year === y ? 'selected' : ''}>${y}</option>`).join('')}</select>
-        <span class="seg" id="dirSeg">${[['', 'ทั้งหมด'], ['รับ', 'รับ'], ['ส่ง', 'ส่ง']].map(([v, l]) => `<button data-d="${v}" aria-pressed="${S.dir === v}">${l}</button>`).join('')}</span>
-        <label class="tgl"><input id="att" type="checkbox" ${S.att ? 'checked' : ''}>${ic('clip')} มีไฟล์แนบ</label></div></div>
-    <p class="status" id="status"></p><div class="list" id="cards"></div>`;
-  let t; $('#q').oninput = e => { clearTimeout(t); t = setTimeout(() => { S.q = e.target.value.trim(); S.limit = 30; doSearch(); }, 400); };
-  $('#year').onchange = e => { S.year = e.target.value; S.limit = 30; doSearch(); };
-  $('#att').onchange = e => { S.att = e.target.checked; S.limit = 30; doSearch(); };
-  $('#dirSeg').onclick = e => { const b = e.target.closest('button'); if (!b) return; S.dir = b.dataset.d; $('#dirSeg').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b)); S.limit = 30; doSearch(); };
-  $('#cards').onclick = e => { if (e.target.closest('a')) return; if (e.target.closest('#moreBtn')) { S.limit += 30; doSearch(); return; } const c = e.target.closest('[data-i]'); if (c) openLetter(S.items[+c.dataset.i]); };
-  doSearch();
-}
-async function doSearch() {
-  const my = ++S.seq;
-  $('#status').innerHTML = '<span class="spin"></span> กำลังค้นหา…';
-  try {
-    const r = await run('api_search', K, S.q, { year: S.year, dir: S.dir, att: S.att, limit: S.limit });
-    if (my !== S.seq || S.view !== 'letters') return;
-    S.items = r.items; S.total = r.total; renderLetters();
-  } catch (e) { $('#status').textContent = 'ค้นหาไม่สำเร็จ: ' + errMsg(e); }
-}
-function renderLetters() {
-  $('#status').textContent = (S.q ? `ผลค้นหา “${S.q}” · ` : '') + `พบ ${S.total.toLocaleString()} เรื่อง` + (S.total > S.items.length ? ` · แสดง ${S.items.length} เรื่องล่าสุด` : '');
-  $('#cards').innerHTML = S.items.length ? S.items.map(letterCard).join('') + (S.total > S.items.length ? `<button class="btn more" id="moreBtn">แสดงเพิ่ม</button>` : '')
-    : `<div class="empty">${ic('search')}ไม่พบเรื่องที่ค้นหา<br>ลองเลือก “ทุกปี” หรือใช้คำที่สั้นลง</div>`;
-}
-
-/* ======================= VIEW: events ======================= */
-function viewEvents() {
-  $('#view').innerHTML = `
-    <div class="ph"><div><h1>งาน & แจ้งเตือน</h1><p>คุมสอบ สอน ประชุม และประกาศ ${ADMIN ? '— ระบบส่งเตือนเข้า LINE ให้อัตโนมัติทุกเช้า' : ''}</p></div>
-      ${ADMIN ? `<div class="act"><button class="btn" id="evPrev">${ic('eye')} ตัวอย่างพรุ่งนี้</button><button class="btn" id="evAnn">${ic('mega')} ส่งประกาศ</button><button class="btn primary" id="evAdd">${ic('plus')} เพิ่มงาน</button></div>` : ''}</div>
-    <div class="toolbar" style="flex-direction:row;align-items:center"><span class="seg" id="evSeg">${[['upcoming', 'กำลังมาถึง'], ['past', 'ที่ผ่านมา']].map(([v, l]) => `<button data-s="${v}" aria-pressed="${S.evScope === v}">${l}</button>`).join('')}</span>
-      <span class="note" id="evCount" style="margin-left:auto"></span></div>
-    <div id="evList"><div class="sk" style="height:70px"></div><div class="sk" style="height:70px;margin-top:10px"></div></div>`;
-  if (ADMIN) { $('#evAdd').onclick = () => eventForm(); $('#evAnn').onclick = announceDrawer; $('#evPrev').onclick = previewDrawer; }
-  $('#evSeg').onclick = e => { const b = e.target.closest('button'); if (!b) return; S.evScope = b.dataset.s; $('#evSeg').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b)); loadEvents(); };
-  $('#evList').onclick = e => { const c = e.target.closest('[data-ei]'); if (c) openEvent(S.events[+c.dataset.ei]); if (e.target.closest('#evEmptyAdd')) eventForm(); };
-  loadEvents();
-}
-async function loadEvents() {
-  try {
-    const list = S.events = await run('api_events', K, S.evScope);
-    if (S.view !== 'events') return;
-    $('#evCount').textContent = list.length + ' รายการ';
-    if (!list.length) { $('#evList').innerHTML = `<div class="panel empty">${ic('cal')}${S.evScope === 'past' ? 'ยังไม่มีงานที่ผ่านมา' : 'ยังไม่มีงานที่กำลังมาถึง'}${ADMIN && S.evScope !== 'past' ? '<br><button class="btn primary sm" id="evEmptyAdd" style="margin-top:12px">' + ic('plus') + ' เพิ่มงานแรก</button>' : ''}</div>`; return; }
-    const today = iso(new Date()); const groups = [];
-    list.forEach((ev, i) => { let g = groups[groups.length - 1]; if (!g || g.date !== ev.date) groups.push(g = { date: ev.date, items: [] }); g.items.push([ev, i]); });
-    $('#evList').innerHTML = groups.map(g => { const d = pd(g.date);
-      return `<div class="day"><div class="dbox ${g.date === today ? 'today' : ''}"><small>${g.date === today ? 'วันนี้' : TH_D[d.getDay()]}</small><b>${d.getDate()}</b><small>${TH_M[d.getMonth()]} ${String(d.getFullYear() + 543).slice(2)}</small></div>
-      <div class="evs">${g.items.map(([ev, i]) => evCard(ev, i)).join('')}</div></div>`; }).join('');
-  } catch (e) { $('#evList').innerHTML = `<div class="warnbox">${esc(errMsg(e))}</div>`; }
-}
-
-/* ======================= VIEW: register (admin) ======================= */
-function viewNew() {
-  const m = S.meta || { cats: [], purposes: [], names: [], urg: ['ปกติ'], sec: ['ปกติ'], next: {}, year: '' };
-  const opts = (a, blank) => (blank ? '<option value="">—</option>' : '') + a.map(x => `<option>${esc(x)}</option>`).join('');
-  const today = iso(new Date());
-  $('#view').innerHTML = `
-    <div class="ph"><div><h1>ลงทะเบียนหนังสือ</h1><p>ระบบออกเลขทะเบียน ตั้งชื่อไฟล์ และเก็บไฟล์ในโฟลเดอร์ ปี/รับ หรือ ส่ง ให้อัตโนมัติ</p></div></div>
-    <div id="newWrap"><form class="form card2" id="fNew" novalidate>
-      <div class="f c6"><span class="lab">ประเภท</span><span class="seg" id="nDir"><button type="button" data-d="รับ" aria-pressed="true">${'หนังสือรับ'}</button><button type="button" data-d="ส่ง" aria-pressed="false">หนังสือส่ง</button></span></div>
-      <div class="c6 nextbox"><div><small>เลขถัดไป หนังสือรับ ${esc(m.year)}</small><b>ร ${String(m.next['รับ'] || '').padStart(4, '0')}</b></div><div><small>เลขถัดไป หนังสือส่ง ${esc(m.year)}</small><b>ส ${String(m.next['ส่ง'] || '').padStart(4, '0')}</b></div></div>
-      <div class="f c2"><label for="nDate">ลงวันที่ (รับ/ส่ง)</label><input id="nDate" type="date" value="${today}"></div>
-      <div class="f c2"><label for="nReg">เลขทะเบียน</label><input id="nReg" type="number" min="1" inputmode="numeric" placeholder="เว้นว่าง = อัตโนมัติ"></div>
-      <div class="f c2 wide"><label for="nLw">หนังสือ ลว.</label><input id="nLw" type="date"></div>
-      <div class="f c6"><label for="nBook">ที่ (เลขที่หนังสือ)</label><input id="nBook" placeholder="เช่น อว 78.xxx/1234 หรือ MDJ 37/2569"></div>
-      <div class="f c6"><label for="nSubj">เรื่อง *</label><textarea id="nSubj" rows="2"></textarea></div>
-      <div class="f c3 wide"><label for="nFrom">จาก</label><input id="nFrom"></div>
-      <div class="f c3 wide"><label for="nTo">ถึง / เรียน</label><input id="nTo"></div>
-      <div class="f c3 wide"><label for="nCat">หมวดเรื่อง</label><select id="nCat">${opts(m.cats, true)}</select></div>
-      <div class="f c3 wide"><label for="nPur">วัตถุประสงค์</label><select id="nPur">${opts(m.purposes, true)}</select></div>
-      <div class="f c2 wide"><label for="nOwner">ผู้รับผิดชอบ</label><input id="nOwner" list="names"><datalist id="names">${m.names.map(x => `<option value="${esc(x)}">`).join('')}</datalist></div>
-      <div class="f c2"><label for="nUrg">ชั้นความเร็ว</label><select id="nUrg">${opts(m.urg.length ? m.urg : ['ปกติ'])}</select></div>
-      <div class="f c2"><label for="nSec">ชั้นความลับ</label><select id="nSec">${opts(m.sec.length ? m.sec : ['ปกติ'])}</select></div>
-      <div class="f c6"><label for="nNote">หมายเหตุ / การสั่งการ</label><input id="nNote"></div>
-      <h3>ที่เก็บตัวจริง (ไม่บังคับ)</h3>
-      <div class="f c2 wide"><label for="nRoom">ห้อง</label><input id="nRoom"></div><div class="f"><label for="nCab">ตู้</label><input id="nCab"></div>
-      <div class="f"><label for="nShelf">ชั้น</label><input id="nShelf"></div><div class="f c2 wide"><label for="nFolder">แฟ้ม</label><input id="nFolder"></div>
-      <h3>ไฟล์แนบ</h3>
-      <label class="drop c6" id="nDrop">${ic('upload')}<span style="flex:1" id="nFilesTxt">เลือกไฟล์สแกน PDF / รูปถ่าย / Word หรือลากมาวาง (หลายไฟล์ได้)</span><input id="nFiles" type="file" multiple accept="application/pdf,image/*,.doc,.docx,.xls,.xlsx" hidden></label>
-      <div class="c6" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><button class="btn primary" id="nSave" type="submit">${ic('check')} บันทึกลงทะเบียน</button><span class="note" id="nMsg" role="alert" style="color:var(--crit)"></span></div>
-    </form></div>`;
-  let nd = 'รับ', files = [];
-  const showFiles = () => { $('#nFilesTxt').textContent = files.length ? files.map(f => f.name).join(', ') : 'เลือกไฟล์สแกน PDF / รูปถ่าย / Word หรือลากมาวาง (หลายไฟล์ได้)'; };
-  $('#nFiles').onchange = () => { files = [...$('#nFiles').files]; showFiles(); };
-  const dr = $('#nDrop'); dr.ondragover = e => { e.preventDefault(); dr.classList.add('on'); }; dr.ondragleave = () => dr.classList.remove('on');
-  dr.ondrop = e => { e.preventDefault(); dr.classList.remove('on'); files = [...e.dataTransfer.files]; showFiles(); };
-  $('#nDir').onclick = e => { const b = e.target.closest('button'); if (!b) return; nd = b.dataset.d; $('#nDir').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b)); };
-  $('#fNew').onsubmit = async e => {
-    e.preventDefault();
-    const v = id => $(id).value.trim();
-    if (!v('#nSubj')) { $('#nMsg').textContent = 'กรุณากรอกเรื่อง'; $('#nSubj').focus(); return; }
-    const b = $('#nSave'); b.disabled = true; b.innerHTML = '<span class="spin"></span> กำลังบันทึก…'; $('#nMsg').textContent = '';
-    try {
-      const rec = await run('api_register', K, { dir: nd, date: v('#nDate'), reg: v('#nReg'), lw: v('#nLw'), book: v('#nBook'), subject: v('#nSubj'), from: v('#nFrom'), to: v('#nTo'), cat: v('#nCat'), purpose: v('#nPur'), owner: v('#nOwner'), urg: v('#nUrg'), sec: v('#nSec'), note: v('#nNote'), room: v('#nRoom'), cab: v('#nCab'), shelf: v('#nShelf'), folder: v('#nFolder') }, await readFiles(files));
-      window.scrollTo(0, 0);
-      $('#newWrap').innerHTML = `<div class="panel done"><div class="ok">${ic('check')}</div><div class="note">ลงทะเบียนแล้ว · เขียนเลขนี้บนหนังสือ</div><div class="big">${esc(rec.label)}</div><b>${esc(rec.subject)}</b>
-        <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:16px">${fileBtns(rec)}<button class="btn" id="copyLbl">${ic('copy')} คัดลอกเลข</button><button class="btn primary" id="again">${ic('plus')} ลงทะเบียนเรื่องต่อไป</button></div></div>`;
-      $('#again').onclick = () => viewNew();
-      $('#copyLbl').onclick = async () => { try { await navigator.clipboard.writeText(rec.label); toast('คัดลอกแล้ว'); } catch (er) { toast(rec.label); } };
-      run('api_meta', K).then(mm => { S.meta = mm; }).catch(() => {});
-    } catch (er) { $('#nMsg').textContent = 'บันทึกไม่สำเร็จ: ' + errMsg(er); b.disabled = false; b.innerHTML = ic('check') + ' บันทึกลงทะเบียน'; }
-  };
-}
-
-/* ======================= VIEW: LINE settings (admin) ======================= */
-function viewLine() {
-  $('#view').innerHTML = `<div class="ph"><div><h1>ตั้งค่า LINE & การแชร์</h1><p>สถานะการเชื่อม LINE OA ผู้รับแจ้งเตือน และลิงก์สำหรับผู้ดู</p></div>
-    <div class="act"><button class="btn" id="lnPrev">${ic('eye')} ตัวอย่างพรุ่งนี้</button><button class="btn primary" id="lnAnn">${ic('mega')} ส่งประกาศ</button></div></div>
-    <div id="lnBody" class="cards3"><div class="panel pb"><div class="sk"></div><div class="sk" style="margin-top:10px"></div></div><div class="panel pb"><div class="sk"></div></div></div>`;
-  $('#lnPrev').onclick = previewDrawer; $('#lnAnn').onclick = announceDrawer;
-  loadLine();
-}
-async function loadLine() {
-  try {
-    const s = await run('api_lineStatus', K);
-    if (S.view !== 'line') return;
-    const row = (ok, title, sub) => `<div class="srow"><span class="sic ${ok === true ? 'ok' : ok === false ? 'bad' : ''}">${ic(ok === true ? 'check' : ok === false ? 'x' : 'bell')}</span><div class="x"><b>${title}</b><small>${sub}</small></div></div>`;
-    const q = s.quota; const pct = q && q.limit ? Math.min(100, Math.round(q.used / q.limit * 100)) : 0;
-    $('#lnBody').innerHTML = `
-      <section class="panel"><h2>${ic('chat')} การเชื่อม LINE OA</h2>
-        ${row(s.token && s.tokenOk, s.token ? (s.tokenOk ? 'เชื่อม LINE OA แล้ว' : 'Token ใช้ไม่ได้') : 'ยังไม่ได้ใส่ Channel access token', s.token ? (s.tokenOk ? 'ส่งข้อความได้' : 'ออก token ใหม่ใน LINE Developers แล้วใส่ในชีต') : 'ชีต → เมนู 📁 สารบรรณ → LINE: ตั้ง Channel access token')}
-        ${row(s.recipients.length > 0, 'ผู้รับแจ้งเตือน ' + s.recipients.length + ' ปลายทาง', s.recipients.length ? s.recipients.map(r => (r.kind === 'user' ? '👤 ' : '👥 ') + esc(r.name)).join(' · ') : 'ชีต → เมนู 📣 แจ้งเตือน LINE → ② เพิ่มผู้รับ')}
-        <div class="srow"><span class="sic ${s.auto ? 'ok' : ''}">${ic('clock')}</span><div class="x"><b>แจ้งเตือนอัตโนมัติทุกเช้า</b><small>${s.auto ? 'เปิดอยู่ · ส่งราว ' + s.hour + ':00–' + s.hour + ':59 น. (วันไม่มีงาน ไม่ส่ง)' : 'ปิดอยู่'}</small></div>
-          <label class="switch" aria-label="เปิดปิดแจ้งเตือนอัตโนมัติ"><input type="checkbox" id="autoSw" ${s.auto ? 'checked' : ''}></label></div>
-        <div class="pb" style="border-top:1px solid var(--line)"><button class="btn sm" id="lnNow">${ic('send')} ส่งแจ้งเตือนรอบวันนี้ทันที</button></div>
-      </section>
-      <section class="panel"><h2>${ic('bell')} โควตาข้อความเดือนนี้</h2><div class="pb">
-        ${q ? `<b style="font-size:26px">${q.used.toLocaleString()}</b> <span class="note">${q.limit ? '/ ' + q.limit.toLocaleString() + ' ข้อความ' : 'ข้อความ (ไม่จำกัด)'}</span>${q.limit ? `<div class="meter"><i style="width:${pct}%;${pct > 80 ? 'background:var(--crit)' : ''}"></i></div><span class="note">เหลือ ${Math.max(0, q.limit - q.used).toLocaleString()} ข้อความ</span>` : ''}`
-          : '<span class="note">ยังอ่านโควตาไม่ได้ (ต้องเชื่อม LINE OA ก่อน)</span>'}
-        <p class="note" style="margin:12px 0 0">ส่งถึงตัวเอง 1 ครั้ง = 1 ข้อความ · ส่งเข้ากลุ่ม 1 ครั้ง = จำนวนสมาชิกในกลุ่ม · คำสั่ง <b>งานวันนี้ / งานพรุ่งนี้</b> และผลค้นหาใน LINE เป็นการตอบกลับ ไม่นับโควตา</p></div>
-      </section>
-      <section class="panel"><h2>${ic('users')} แชร์ให้คนอื่นดู (แก้ไขไม่ได้)</h2><div class="pb" style="display:flex;flex-direction:column;gap:12px">
-        <div><div class="note" style="margin-bottom:6px">ลิงก์ผู้ดู — ส่งให้อาจารย์/เจ้าหน้าที่</div>${s.viewUrl ? `<div class="copy"><input readonly value="${esc(s.viewUrl)}" id="vUrl"><button class="btn sm" id="vCopy">${ic('copy')} คัดลอก</button></div>` : '<span class="note">ชีต → เมนู 📁 สารบรรณ → ① ตั้งค่าเริ่มต้น เพื่อสร้างลิงก์</span>'}</div>
-        <div class="note">ผู้ดูที่เปิดไฟล์แนบได้: <b>${s.viewers}</b> คน · ผู้ใช้ LINE ที่ค้นหาได้: <b>${s.lineUsers}</b> คน · ผู้ประกาศผ่าน LINE: <b>${s.admins}</b> คน<br>เพิ่ม/ลบได้ที่เมนูในชีต (👁 ผู้ดู, LINE: เพิ่มผู้ใช้, ③ เพิ่มผู้ประกาศ)</div>
-        ${s.webhook ? `<div><div class="note" style="margin-bottom:6px">Webhook URL สำหรับ LINE Developers</div><div class="copy"><input readonly value="${esc(s.webhook)}" id="wUrl"><button class="btn sm" id="wCopy">${ic('copy')}</button></div></div>` : ''}
-      </div></section>`;
-    const cp = (btn, inp) => { if ($(btn)) $(btn).onclick = async () => { try { await navigator.clipboard.writeText($(inp).value); toast('คัดลอกแล้ว'); } catch (e) { $(inp).select(); toast('กด Ctrl+C เพื่อคัดลอก'); } }; };
-    cp('#vCopy', '#vUrl'); cp('#wCopy', '#wUrl');
-    $('#lnNow').onclick = sendNow;
-    $('#autoSw').onchange = async e => {
-      const on = e.target.checked; e.target.disabled = true;
-      try { const r = await run('api_setAuto', K, on); toast(r ? 'เปิดแจ้งเตือนอัตโนมัติแล้ว' : 'ปิดแจ้งเตือนอัตโนมัติแล้ว'); loadLine(); }
-      catch (er) { toast(errMsg(er)); e.target.checked = !on; e.target.disabled = false; }
-    };
-  } catch (e) { $('#lnBody').innerHTML = `<div class="warnbox">${esc(errMsg(e))}</div>`; }
-}
-
-/* ======================= start ======================= */
-renderNav();
-if (PREVIEW) {
-  $('#view').innerHTML = `<section class="hero"><small>โหมดพรีวิว</small><h1>ไฟล์นี้คือหน้าแอป สารบรรณออนไลน์</h1>
-    <p style="margin:0;max-width:640px;position:relative;z-index:1">หน้านี้จะทำงานจริงเมื่อวางไว้ใน Google Apps Script (ไฟล์ชื่อ Index) และเปิดจากลิงก์เว็บแอปที่มี ?k=… เท่านั้น — ทำตามคู่มือ ขั้นที่ 4–8</p></section>
-    <div class="panel pb note">เปิดแบบนี้ (พรีวิวในแชต หรือดับเบิลคลิกไฟล์ในเครื่อง) จะยังไม่มีข้อมูล เพราะไม่ได้เชื่อมกับชีตทะเบียน — ไม่ใช่ข้อผิดพลาด</div>`;
-} else run('api_meta', K).then(m => {
-  S.meta = m;
-  const sel = $('#year');
-  if (S.view === 'letters' && sel && sel.options.length <= 1) sel.innerHTML = '<option value="">ทุกปี</option>' + m.years.map(y => `<option>${y}</option>`).join('');
-  if (S.view === 'new' && $('#nSubj') && !$('#nSubj').value) viewNew();
-}).catch(() => {});
-if (!PREVIEW) go(S.q ? 'letters' : (BOOT.view || 'home'));
+/* เปิดจากลิงก์แชร์แบบ  https://…github.io/…/#k=รหัส  (รหัสอยู่หลัง # จึงไม่ถูกส่งไปเซิร์ฟเวอร์ใด) */
+(function start() {
+  const h = location.hash.replace(/^#/, '');
+  if (h) {
+    const k = (h.match(/(?:^|&)k=([A-Za-z0-9]+)/) || [])[1];
+    const link = toLink(k ? k : decodeURIComponent(h));
+    history.replaceState(null, '', location.pathname + location.search);
+    if (link) { store.set(link, true); openApp(link); return; }
+  }
+  const saved = store.get();
+  if (saved) openApp(saved); else showGate();
+})();
 </script>
 </body>
 </html>
