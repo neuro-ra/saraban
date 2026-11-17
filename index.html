@@ -171,8 +171,8 @@ mark{background:color-mix(in srgb,#FFC83D 55%,transparent);color:inherit;border-
 .lrow .subj{font-weight:600;font-size:15px;line-height:1.5;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .lrow .meta{font-size:13px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .lrow .end{flex:none;display:flex;align-items:center;gap:6px;color:var(--ink-3)}
-.lrow .att{display:inline-flex;align-items:center;gap:3px;font-size:12px;font-weight:600;color:var(--accent);background:var(--accent-soft);border-radius:99px;padding:3px 8px}
-.lrow .att svg.i{width:14px;height:14px}
+.lrow .fcount{display:inline-flex;align-items:center;gap:3px;font-size:12px;font-weight:600;color:var(--accent);background:var(--accent-soft);border-radius:99px;padding:3px 8px}
+.lrow .fcount svg.i{width:14px;height:14px}
 .lrow .chev svg.i{width:18px;height:18px}
 @media (max-width:640px){.lrow{gap:11px;padding:11px 10px 11px 10px}.dblk{width:44px}.lrow .chev{display:none}.lrow .subj{font-size:14.5px}}
 .ychips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:1px 1px 2px;-webkit-mask-image:linear-gradient(to right,#000 92%,transparent)}
@@ -230,6 +230,12 @@ dt{color:var(--ink-3);font-size:13.5px}dd{margin:0;overflow-wrap:anywhere}
 .att{display:flex;flex-direction:column;gap:8px}
 .att a{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:12px;padding:11px 14px;text-decoration:none;color:var(--ink)}
 .att a:hover{border-color:var(--accent)}.att a b{flex:1;font-weight:600}
+.frow{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:12px;padding:8px 8px 8px 14px;background:var(--surface)}
+.frow b{flex:1;font-weight:600}.frow .fi{color:var(--accent);display:flex}
+.att .frow a.btn{display:inline-flex;border-radius:10px;padding:6px 10px;gap:5px}
+.frow .btn.sm{padding:6px 10px}
+.fbtn{border:0;cursor:pointer}
+@media (max-width:640px){.hide-s{display:none}}
 .att .fi{width:34px;height:34px;border-radius:9px;background:var(--rose-soft);color:var(--rose);display:grid;place-items:center}
 .drop{border:2px dashed var(--line);border-radius:12px;padding:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;color:var(--ink-2);font-size:14px}
 .drop.on{border-color:var(--accent);background:var(--accent-soft)}
@@ -550,7 +556,29 @@ function hl(t) {
   const s = esc(t); const terms = thD(S.q).toLowerCase().split(/\s+/).filter(x => x.length > 1).map(x => esc(x).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
   if (!terms.length) return s; try { return s.replace(new RegExp('(' + terms.join('|') + ')', 'gi'), '<mark>$1</mark>'); } catch (e) { return s; }
 }
-const fileBtns = it => it.files.map((u, i) => `<a class="fbtn" href="${esc(u)}" rel="noopener" onclick="event.stopPropagation()">${ic('clip')} ${it.files.length > 1 ? 'ไฟล์ ' + (i + 1) : 'เปิดหนังสือ'}</a>`).join('');
+const fileBtns = it => it.files.map((u, i) => `<button class="fbtn" data-fopen="${esc(u)}">${ic('clip')} ${it.files.length > 1 ? 'ไฟล์ ' + (i + 1) : 'เปิดหนังสือ'}</button>`).join('');
+/* เปิดไฟล์ผ่านแอป (ดึงจาก Drive ด้วยสิทธิ์ของระบบ) — ไม่ต้องล็อกอิน Google */
+const FILE_URL = {};
+async function openFile(u, btn) {
+  const w = window.open('', '_blank');
+  const show = (url, f) => {
+    if (w && /^(application\/pdf|image\/|text\/plain)/.test(f.mime)) { w.location.href = url; return; }
+    if (w) w.close();
+    const a = document.createElement('a'); a.href = url; a.download = f.name; document.body.appendChild(a); a.click(); a.remove(); toast('ดาวน์โหลด ' + f.name);
+  };
+  if (FILE_URL[u]) return show(FILE_URL[u].url, FILE_URL[u].f);
+  if (w) { try { w.document.write('<meta charset="utf-8"><title>กำลังเปิดไฟล์…</title><body style="font-family:sans-serif;display:grid;place-items:center;height:90vh;color:#555">กำลังเปิดไฟล์… รอสักครู่</body>'); } catch (e) { } }
+  const t = btn && btn.innerHTML; if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spin"></span> กำลังเปิด…'; }
+  try {
+    const f = await run('api_file', K, u);
+    const bin = atob(f.data); const bytes = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    const url = URL.createObjectURL(new Blob([bytes], { type: f.mime }));
+    FILE_URL[u] = { url: url, f: { name: f.name, mime: f.mime } };
+    show(url, f);
+  } catch (e) { if (w) w.close(); toast(errMsg(e)); }
+  finally { if (btn) { btn.disabled = false; btn.innerHTML = t; } }
+}
+document.addEventListener('click', e => { const b = e.target.closest('[data-fopen]'); if (b) { e.preventDefault(); e.stopPropagation(); openFile(b.dataset.fopen, b); } }, true);
 const ST_CLS = { 'รอดำเนินการ': 'warn', 'กำลังดำเนินการ': 'blue', 'ส่งต่อแล้ว': 'out', 'เสร็จสิ้น': 'ok' };
 const stChip = s => s ? `<span class="chip ${ST_CLS[s] || ''}">${esc(s)}</span>` : '';
 function letterRow(it, i, attr) {
@@ -564,7 +592,7 @@ function letterRow(it, i, attr) {
     <div class="bd"><div class="top"><span class="kind">${out ? 'ส่ง' : 'รับ'}</span><span class="lbl">${hl(it.label || 'ไม่มีเลข')}</span>${stChip(it.status)}${flags}</div>
       <div class="subj">${hl(it.subject)}</div>
       <div class="meta">${hl(who)}${it.book ? ' · ที่ ' + hl(it.book) : ''}${it.owner ? ' · ' + hl(it.owner) : ''}</div></div>
-    <div class="end">${it.files.length ? `<span class="att" title="มีไฟล์แนบ">${ic('clip')}${it.files.length > 1 ? it.files.length : ''}</span>` : ''}<span class="chev">${ic('chev')}</span></div></article>`;
+    <div class="end">${it.files.length ? `<span class="fcount" title="มีไฟล์แนบ">${ic('clip')}${it.files.length > 1 ? it.files.length : ''}</span>` : ''}<span class="chev">${ic('chev')}</span></div></article>`;
 }
 function miniLetter(it, i) {
   const out = it.dir === 'ส่ง';
@@ -576,17 +604,27 @@ function openLetter(it) {
   const out = it.dir === 'ส่ง';
   const row = (k, v) => v ? `<dt>${k}</dt><dd>${esc(v)}</dd>` : '';
   const loc = [it.room, it.cab && 'ตู้ ' + it.cab, it.shelf && 'ชั้น ' + it.shelf, it.folder && 'แฟ้ม ' + it.folder].filter(Boolean).join(' · ');
-  const files = it.files.map((u, i) => `<a href="${esc(u)}" rel="noopener"><span class="fi">${ic('file')}</span><b>ไฟล์ที่ ${i + 1}</b><span class="note">เปิดใน Drive</span>${ic('ext')}</a>`).join('');
+  const files = it.files.map((u, i) => `<div class="frow"><span class="fi">${ic('file')}</span><b>ไฟล์ที่ ${i + 1}</b>
+    <button class="btn sm primary" data-fopen="${esc(u)}">${ic('eye')} เปิดดู</button>
+    ${ADMIN ? `<a class="btn sm" href="${esc(u)}" rel="noopener" target="_blank" title="เปิดใน Google Drive">${ic('ext')}<span class="hide-s">Drive</span></a><button class="btn sm danger" data-fdel="${esc(u)}" title="ลบไฟล์นี้">${ic('trash')}<span class="hide-s">ลบ</span></button>` : ''}</div>`).join('');
   const hist = String(it.log || '').split('\n').filter(Boolean).reverse();
   openDrawer(`<span class="chip ${out ? 'out' : 'in'}">${out ? 'หนังสือส่ง' : 'หนังสือรับ'}</span> <span class="mono" style="margin-left:6px">${esc(it.label || '')}</span> ${stChip(it.status)}`,
     `<h2>${esc(it.subject)}</h2>
     <dl>${row('ที่', it.book)}${row('ลงวันที่', it.dateTH)}${row('หนังสือ ลว.', it.dir === 'รับ' ? it.lw : '')}${row('จาก', it.from)}${row('ถึง / เรียน', it.to)}${row('หมวดเรื่อง', it.cat)}${row('ผู้รับผิดชอบ', it.owner)}${row('ผู้ดำเนินการ', it.doer)}${row('วัตถุประสงค์', it.purpose)}${row('สถานที่จัดงาน', it.venue)}${row('วันที่จัด', [it.d1, it.d2 && it.d2 !== it.d1 ? it.d2 : ''].filter(Boolean).join(' – '))}${row('ที่เก็บตัวจริง', loc)}${row('หมายเหตุ', it.note)}</dl>
     ${ADMIN && it.chk ? `<div class="warnbox"><b>ควรตรวจสอบ:</b> ${esc(it.chk)}</div>` : ''}
-    <div class="sec"><h3>เอกสารแนบ</h3><div class="att">${files || '<span class="note">ยังไม่มีไฟล์แนบ' + (ADMIN && it.old ? ' · ไฟล์เดิมเคยอยู่ที่ ' + esc(it.old) : '') + '</span>'}</div>
-      ${ADMIN ? `<label class="drop" id="upDrop" style="margin-top:10px">${ic('upload')}<span style="flex:1">เลือกไฟล์ / ลากมาวาง เพื่อแนบเพิ่ม</span><input id="upFiles" type="file" multiple accept="application/pdf,image/*,.doc,.docx,.xls,.xlsx" hidden></label>` : (files ? '<p class="note" style="margin:8px 0 0">เปิดไฟล์ไม่ได้? เข้าสู่ระบบ Google ด้วยอีเมลที่ผู้ดูแลเพิ่มให้</p>' : '')}</div>
+    <div class="sec"><h3>เอกสารแนบ</h3><div class="att" id="attList">${files || '<span class="note">ยังไม่มีไฟล์แนบ' + (ADMIN && it.old ? ' · ไฟล์เดิมเคยอยู่ที่ ' + esc(it.old) : '') + '</span>'}</div>
+      ${ADMIN ? `<label class="drop" id="upDrop" style="margin-top:10px">${ic('upload')}<span style="flex:1"><b>เพิ่มไฟล์แนบ</b> — เลือกไฟล์ หรือลากมาวาง</span><input id="upFiles" type="file" multiple accept="application/pdf,image/*,.doc,.docx,.xls,.xlsx" hidden></label>` : ''}</div>
     ${hist.length ? `<div class="sec"><h3>ประวัติการดำเนินการ</h3><ol class="hist">${hist.map(h => `<li>${esc(h)}</li>`).join('')}</ol></div>` : ''}
     ${ADMIN ? `<p class="note" style="margin:0">แถวที่ ${it.row} ในชีต${S.meta && S.meta.sheetUrl ? ` · <a href="${esc(S.meta.sheetUrl + '&range=A' + it.row)}">เปิดในชีต</a> <span class="note">(ต้องล็อกอิน Google บัญชีเจ้าของ)</span>` : ''}${it.src ? '<br>ที่มา: ' + esc(it.src) : ''}</p>` : ''}`, ADMIN ? `<button class="btn" id="ltEdit">${ic('edit')} แก้ไข</button><button class="btn" id="ltFwd">${ic('send')} ส่งต่อ</button>${it.status === 'เสร็จสิ้น' ? `<button class="btn" id="ltReopen">เปิดเรื่องอีกครั้ง</button>` : `<button class="btn primary" id="ltDone">${ic('check')} เสร็จสิ้น</button>`}` : '');
   if (!ADMIN) return;
+  $('#attList').onclick = async e => {
+    const d = e.target.closest('[data-fdel]'); if (!d) return;
+    const n = [...$('#attList').querySelectorAll('[data-fdel]')].indexOf(d) + 1;
+    if (!confirm('ลบไฟล์ที่ ' + n + ' ออกจากหนังสือนี้?\n(ไฟล์จะย้ายไปถังขยะ Google Drive กู้คืนได้ภายใน 30 วัน)')) return;
+    d.disabled = true; d.innerHTML = '<span class="spin"></span>';
+    try { const r = await run('api_detach', K, it.row, d.dataset.fdel); Object.assign(it, r.rec); fixRec(it); toast(r.msg); openLetter(it); if (S.view === 'letters') renderLetters(); else if (S.view === 'home') loadHome(); }
+    catch (er) { toast(errMsg(er)); openLetter(it); }
+  };
   $('#ltEdit').onclick = () => editLetter(it);
   $('#ltFwd').onclick = () => forwardLetter(it);
   const setSt = async (st, btn) => { btn.disabled = true; try { const r = await run('api_action', K, it.row, { type: 'status', status: st }); Object.assign(it, r.rec); fixRec(it); toast(r.msg); openLetter(it); if (S.view === 'letters') doSearch(); } catch (e) { toast(errMsg(e)); btn.disabled = false; } };
