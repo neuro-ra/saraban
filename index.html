@@ -180,6 +180,18 @@ mark{background:color-mix(in srgb,#FFC83D 55%,transparent);color:inherit;border-
 .ychips button{flex:none;border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:5px 13px;font-size:13.5px;font-weight:500;color:var(--ink-2)}
 .ychips button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--bg);font-weight:600}
 .lrow:first-child{border-top:0}
+.lrow .chip svg.i{width:13px;height:13px}
+.qdue{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.qdue button{border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:3px 11px;font-size:12.5px;color:var(--ink-2)}
+.qdue button:hover{border-color:var(--accent);color:var(--accent)}
+.opbox{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.opbox>div{border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--surface)}
+.opbox small{display:block;font-size:12px;color:var(--ink-3)}.opbox b{font-weight:600}
+.opbox .due{--c:var(--blue);--cs:var(--blue-soft);background:var(--cs);border-color:transparent}
+.opbox .due.warn{--c:var(--amber);--cs:var(--amber-soft)}.opbox .due.crit{--c:var(--rose);--cs:var(--rose-soft)}
+.opbox .due b{color:var(--c);font-size:16px;display:block}.opbox .due span{font-size:12.5px;font-weight:600;color:var(--c)}
+.duepanel{margin-bottom:16px;border-color:color-mix(in srgb,var(--amber) 35%,var(--line))}
+.duepanel h2 .chip{margin-left:4px}
 .grid2>*,.stats>*,.lgrp,.list,.app>*,#view{min-width:0}
 .qchips{display:flex;gap:6px;flex-wrap:wrap}
 .sync{position:fixed;top:12px;right:14px;z-index:40;display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;padding:6px 12px;border-radius:99px;background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);color:var(--ink-2);transition:opacity .4s}
@@ -495,7 +507,7 @@ function saveCache() {
   saveCache.t = setTimeout(() => {
     if (!PERSIST || !K || !S.recs || !S.ver) return;
     const recs = S.recs.map(r => S.cols.map(c => c === 'files' ? r.files.join('\n') : (r[c] == null ? '' : r[c])));
-    IDB.set('cache', { k: K, ver: S.ver, cols: S.cols, recs: recs, meta: S.meta, events: S.upEvents, line: S.line, role: ADMIN ? 'admin' : 'view', at: Date.now() });
+    IDB.set('cache', { schema: 3, k: K, ver: S.ver, cols: S.cols, recs: recs, meta: S.meta, events: S.upEvents, line: S.line, role: ADMIN ? 'admin' : 'view', at: Date.now() });
   }, 600);
 }
 function sync(msg, kind) {
@@ -534,6 +546,7 @@ function go(v, opt) {
 document.addEventListener('click', e => {
   if (e.target.closest('[data-logout]')) { e.preventDefault(); logout(); return; }
   if (e.target.closest('[data-reload]')) { e.preventDefault(); if (K) enter(K, undefined, true); return; }
+  if (e.target.closest('[data-duelist]')) { e.preventDefault(); S.q = ''; S.st = '__due'; S.year = ''; S.dir = ''; go('letters'); return; }
   if (e.target.closest('[data-pending]')) { e.preventDefault(); S.q = ''; S.st = 'รอดำเนินการ'; S.year = ''; S.dir = ''; go('letters'); return; }
   const n = e.target.closest('[data-nav]'); if (n) { e.preventDefault(); go(n.dataset.nav); return; }
   if (e.target.closest('[data-close]')) { closeDrawer(); return; }
@@ -581,6 +594,41 @@ async function openFile(u, btn) {
 document.addEventListener('click', e => { const b = e.target.closest('[data-fopen]'); if (b) { e.preventDefault(); e.stopPropagation(); openFile(b.dataset.fopen, b); } }, true);
 const ST_CLS = { 'รอดำเนินการ': 'warn', 'กำลังดำเนินการ': 'blue', 'ส่งต่อแล้ว': 'out', 'เสร็จสิ้น': 'ok' };
 const stChip = s => s ? `<span class="chip ${ST_CLS[s] || ''}">${esc(s)}</span>` : '';
+/* กำหนดส่ง: นับวันที่เหลือ */
+function dueInfo(it) {
+  if (!it || !/^\d{4}-\d{2}-\d{2}$/.test(it.due || '')) return null;
+  const n = Math.round((pd(it.due) - pd(iso(new Date()))) / 864e5);
+  const d = thShortD(it.due);
+  if (it.status === 'เสร็จสิ้น') return { n, cls: '', txt: 'กำหนดส่ง ' + d, done: true };
+  if (n < 0) return { n, cls: 'crit', txt: 'เลยกำหนด ' + (-n) + ' วัน' };
+  if (n === 0) return { n, cls: 'crit', txt: 'ครบกำหนดวันนี้' };
+  if (n === 1) return { n, cls: 'warn', txt: 'ครบกำหนดพรุ่งนี้' };
+  if (n <= 3) return { n, cls: 'warn', txt: 'อีก ' + n + ' วัน' };
+  return { n, cls: 'blue', txt: 'ส่งภายใน ' + d };
+}
+const thShortD = s => { const p = s.split('-').map(Number); return p[2] + ' ' + TH_M[p[1] - 1]; };
+const dueChip = it => { const d = dueInfo(it); return d && !d.done ? `<span class="chip ${d.cls}">${ic('clock')}${esc(d.txt)}</span>` : ''; };
+/* ปุ่มลัดตั้งกำหนดส่ง */
+const quickDue = id => `<span class="qdue" data-for="${id}">${[[3, '+3 วัน'], [7, '+7 วัน'], [15, '+15 วัน'], [30, '+30 วัน']].map(([n, l]) => `<button type="button" data-n="${n}">${l}</button>`).join('')}<button type="button" data-n="">ล้าง</button></span>`;
+document.addEventListener('click', e => { const b = e.target.closest('.qdue button'); if (!b) return; const inp = document.getElementById(b.parentNode.dataset.for); if (inp) inp.value = b.dataset.n ? addD(iso(new Date()), +b.dataset.n) : ''; });
+/* กล่อง "การดำเนินการ" ในหน้าอ่าน */
+function opBox(it) {
+  const d = dueInfo(it);
+  const range = [it.d1, it.d2 && it.d2 !== it.d1 ? it.d2 : ''].filter(Boolean).map(thDate).join(' – ');
+  if (!d && !range && !it.doer && !it.venue) return '';
+  const cell = (k, v) => v ? `<div><small>${k}</small><b>${v}</b></div>` : '';
+  return `<div class="sec"><h3>การดำเนินการ</h3><div class="opbox">
+    ${d ? `<div class="due ${d.cls}"><small>กำหนดส่งภายใน</small><b>${esc(thDate(it.due))}</b>${d.done ? '<span>ดำเนินการเสร็จแล้ว</span>' : `<span>${esc(d.txt)}</span>`}</div>` : ''}
+    ${cell('ระยะเวลา (ตั้งแต่ – ถึง)', esc(range))}${cell('ผู้ดำเนินการ', esc(it.doer))}${cell('สถานที่', esc(it.venue))}</div></div>`;
+}
+/* ช่องกรอก "การดำเนินการ" (ใช้ทั้งลงทะเบียนและแก้ไข) */
+const opFields = (p, it) => `<h3>การดำเนินการ (ไม่บังคับ)</h3>
+    <div class="f c3 wide"><label for="${p}D1">ตั้งแต่วันที่</label><input id="${p}D1" type="date" value="${esc(it.d1 || '')}"></div>
+    <div class="f c3 wide"><label for="${p}D2">ถึงวันที่</label><input id="${p}D2" type="date" value="${esc(it.d2 || '')}"></div>
+    <div class="f c6"><label for="${p}Due">กำหนดส่งภายใน</label><input id="${p}Due" type="date" value="${esc(it.due || '')}">${quickDue(p + 'Due')}</div>
+    <div class="f c3 wide"><label for="${p}Doer">ผู้ดำเนินการ</label><input id="${p}Doer" list="${p}Names2" value="${esc(it.doer || '')}"><datalist id="${p}Names2">${((S.meta && S.meta.names) || []).map(x => `<option value="${esc(x)}">`).join('')}</datalist></div>
+    <div class="f c3 wide"><label for="${p}Venue">สถานที่</label><input id="${p}Venue" value="${esc(it.venue || '')}"></div>`;
+const opVals = p => { const v = id => ($('#' + p + id) || {}).value || ''; return { d1: v('D1'), d2: v('D2'), due: v('Due'), doer: v('Doer').trim(), venue: v('Venue').trim() }; };
 function letterRow(it, i, attr) {
   const out = it.dir === 'ส่ง';
   const p = String(it.date || '').split('-').map(Number);
@@ -589,7 +637,7 @@ function letterRow(it, i, attr) {
   const who = out ? 'ถึง ' + (it.to || '—') : 'จาก ' + (it.from || '—');
   return `<article class="lrow ${out ? 'out' : 'in'}" data-open data-${attr || 'i'}="${i}" tabindex="0">
     <div class="dblk">${db}</div>
-    <div class="bd"><div class="top"><span class="kind">${out ? 'ส่ง' : 'รับ'}</span><span class="lbl">${hl(it.label || 'ไม่มีเลข')}</span>${stChip(it.status)}${flags}</div>
+    <div class="bd"><div class="top"><span class="kind">${out ? 'ส่ง' : 'รับ'}</span><span class="lbl">${hl(it.label || 'ไม่มีเลข')}</span>${stChip(it.status)}${dueChip(it)}${flags}</div>
       <div class="subj">${hl(it.subject)}</div>
       <div class="meta">${hl(who)}${it.book ? ' · ที่ ' + hl(it.book) : ''}${it.owner ? ' · ' + hl(it.owner) : ''}</div></div>
     <div class="end">${it.files.length ? `<span class="fcount" title="มีไฟล์แนบ">${ic('clip')}${it.files.length > 1 ? it.files.length : ''}</span>` : ''}<span class="chev">${ic('chev')}</span></div></article>`;
@@ -610,7 +658,8 @@ function openLetter(it) {
   const hist = String(it.log || '').split('\n').filter(Boolean).reverse();
   openDrawer(`<span class="chip ${out ? 'out' : 'in'}">${out ? 'หนังสือส่ง' : 'หนังสือรับ'}</span> <span class="mono" style="margin-left:6px">${esc(it.label || '')}</span> ${stChip(it.status)}`,
     `<h2>${esc(it.subject)}</h2>
-    <dl>${row('ที่', it.book)}${row('ลงวันที่', it.dateTH)}${row('หนังสือ ลว.', it.dir === 'รับ' ? it.lw : '')}${row('จาก', it.from)}${row('ถึง / เรียน', it.to)}${row('หมวดเรื่อง', it.cat)}${row('ผู้รับผิดชอบ', it.owner)}${row('ผู้ดำเนินการ', it.doer)}${row('วัตถุประสงค์', it.purpose)}${row('สถานที่จัดงาน', it.venue)}${row('วันที่จัด', [it.d1, it.d2 && it.d2 !== it.d1 ? it.d2 : ''].filter(Boolean).join(' – '))}${row('ที่เก็บตัวจริง', loc)}${row('หมายเหตุ', it.note)}</dl>
+    <dl>${row('ที่', it.book)}${row('ลงวันที่', it.dateTH)}${row('หนังสือ ลว.', it.dir === 'รับ' ? it.lw : '')}${row('จาก', it.from)}${row('ถึง / เรียน', it.to)}${row('หมวดเรื่อง', it.cat)}${row('ผู้รับผิดชอบ', it.owner)}${row('วัตถุประสงค์', it.purpose)}${row('ที่เก็บตัวจริง', loc)}${row('หมายเหตุ', it.note)}</dl>
+    ${opBox(it)}
     ${ADMIN && it.chk ? `<div class="warnbox"><b>ควรตรวจสอบ:</b> ${esc(it.chk)}</div>` : ''}
     <div class="sec"><h3>เอกสารแนบ</h3><div class="att" id="attList">${files || '<span class="note">ยังไม่มีไฟล์แนบ' + (ADMIN && it.old ? ' · ไฟล์เดิมเคยอยู่ที่ ' + esc(it.old) : '') + '</span>'}</div>
       ${ADMIN ? `<label class="drop" id="upDrop" style="margin-top:10px">${ic('upload')}<span style="flex:1"><b>เพิ่มไฟล์แนบ</b> — เลือกไฟล์ หรือลากมาวาง</span><input id="upFiles" type="file" multiple accept="application/pdf,image/*,.doc,.docx,.xls,.xlsx" hidden></label>` : ''}</div>
@@ -659,6 +708,7 @@ function editLetter(it) {
     <div class="f c3 wide"><label for="edUrg">ชั้นความเร็ว</label><select id="edUrg">${opts(m.urg, it.urg)}</select></div>
     <div class="f c3 wide"><label for="edSec">ชั้นความลับ</label><select id="edSec">${opts(m.sec, it.sec)}</select></div>
     ${inp('edNote', 'หมายเหตุ / การสั่งการ', it.note)}
+    ${opFields('ed', it)}
     <h3>ที่เก็บตัวจริง</h3>${inp('edRoom', 'ห้อง', it.room, 'c3 wide')}${inp('edCab', 'ตู้', it.cab, 'c3 wide')}${inp('edShelf', 'ชั้น', it.shelf, 'c3 wide')}${inp('edFolder', 'แฟ้ม', it.folder, 'c3 wide')}
     <p class="note c6" id="edMsg" style="margin:0;color:var(--crit)"></p></form>`,
     `<button class="btn primary" id="edSave">${ic('check')} บันทึกการแก้ไข</button><button class="btn" id="edBack">ยกเลิก</button>`);
@@ -669,6 +719,7 @@ function editLetter(it) {
     const f = { date: v('#edDate'), book: v('#edBook'), subject: v('#edSubj'), from: v('#edFrom'), to: v('#edTo'), cat: v('#edCat'), purpose: v('#edPur'),
       owner: v('#edOwner'), status: v('#edSt'), urg: v('#edUrg'), sec: v('#edSec'), note: v('#edNote'), room: v('#edRoom'), cab: v('#edCab'), shelf: v('#edShelf'), folder: v('#edFolder') };
     if (v('#edLw')) f.lw = v('#edLw');
+    Object.assign(f, opVals('ed'));
     const b = $('#edSave'); b.disabled = true; b.innerHTML = '<span class="spin"></span> กำลังบันทึก…';
     try { const rec = await run('api_update', K, it.row, f); Object.assign(it, rec); fixRec(it); sortRecs(); toast('บันทึกการแก้ไขแล้ว'); openLetter(it); if (S.view === 'letters') doSearch(); }
     catch (e) { $('#edMsg').textContent = errMsg(e); b.disabled = false; b.innerHTML = ic('check') + ' บันทึกการแก้ไข'; }
@@ -679,7 +730,8 @@ function forwardLetter(it) {
   const canLine = !!(S.line && S.line.token && S.line.recipients);
   openDrawer('ส่งต่อ ' + esc(it.label || ''), `<p class="note" style="margin:0">${esc(it.subject)}</p>
     <div class="f"><label for="fwTo">ส่งต่อถึง *</label><input id="fwTo" list="fwNames" placeholder="เช่น อ.จรุงไทย / คุณกัลยา"><datalist id="fwNames">${names.map(x => `<option value="${esc(x)}">`).join('')}</datalist></div>
-    <div class="f"><label for="fwNote">หมายเหตุ / การสั่งการ</label><textarea id="fwNote" rows="3" placeholder="เช่น เพื่อพิจารณา ภายใน 20 พ.ย."></textarea></div>
+    <div class="f"><label for="fwNote">หมายเหตุ / การสั่งการ</label><textarea id="fwNote" rows="3" placeholder="เช่น เพื่อพิจารณา / เพื่อดำเนินการ"></textarea></div>
+    <div class="f"><label for="fwDue">กำหนดส่งภายใน (ไม่บังคับ)</label><input id="fwDue" type="date" value="${esc(it.due || '')}">${quickDue('fwDue')}</div>
     <div class="f"><label for="fwSt">สถานะหลังส่งต่อ</label><select id="fwSt"><option>ส่งต่อแล้ว</option><option>กำลังดำเนินการ</option><option>เสร็จสิ้น</option></select></div>
     <label class="switch"><input type="checkbox" id="fwLine" ${canLine ? 'checked' : 'disabled'}> แจ้งทาง LINE ด้วย${canLine ? '' : ' (ตั้งค่า LINE ก่อน)'}</label>
     <p class="note" id="fwMsg" style="margin:0;color:var(--crit)"></p>`,
@@ -689,7 +741,7 @@ function forwardLetter(it) {
   $('#fwGo').onclick = async () => {
     const to = $('#fwTo').value.trim(); if (!to) { $('#fwMsg').textContent = 'กรุณาระบุว่าส่งต่อถึงใคร'; return; }
     const b = $('#fwGo'); b.disabled = true; b.innerHTML = '<span class="spin"></span> กำลังบันทึก…';
-    try { const r = await run('api_action', K, it.row, { type: 'forward', to: to, note: $('#fwNote').value.trim(), status: $('#fwSt').value, line: $('#fwLine').checked });
+    try { const r = await run('api_action', K, it.row, { type: 'forward', to: to, note: $('#fwNote').value.trim(), status: $('#fwSt').value, due: $('#fwDue').value, line: $('#fwLine').checked });
       Object.assign(it, r.rec); fixRec(it); toast(r.msg); openLetter(it); if (S.view === 'letters') doSearch(); }
     catch (e) { $('#fwMsg').textContent = errMsg(e); b.disabled = false; b.innerHTML = ic('send') + ' บันทึกการส่งต่อ'; }
   };
@@ -825,8 +877,9 @@ function searchLocal(q, opt) {
   const m = qq.match(/^([\u0E23\u0E2A])\s*0*(\d{1,4})\s*\/\s*(25\d\d)$/);
   if (m) qq = m[1] + ' ' + ('000' + m[2]).slice(-4) + '/' + m[3];
   const terms = qq ? (m ? [qq] : qq.split(' ').filter(Boolean)) : [];
-  const out = S.recs.filter(r => (!opt.year || String(r.year) === String(opt.year)) && (!opt.dir || r.dir === opt.dir) &&
-    (!opt.att || r.files.length) && (!opt.st || (r.status || '') === opt.st) && terms.every(x => r.hay.indexOf(x) >= 0));
+  let out = S.recs.filter(r => (!opt.year || String(r.year) === String(opt.year)) && (!opt.dir || r.dir === opt.dir) &&
+    (!opt.att || r.files.length) && (!opt.st || (opt.st === '__due' ? (r.due && r.status !== 'เสร็จสิ้น') : (r.status || '') === opt.st)) && terms.every(x => r.hay.indexOf(x) >= 0));
+  if (opt.st === '__due') out = out.slice().sort((a, b) => a.due.localeCompare(b.due));
   return { total: out.length, items: out.slice(0, opt.limit || 30), all: out };
 }
 async function refreshUp() { try { S.upEvents = await run('api_events', K, 'upcoming'); } catch (e) { } }
@@ -839,6 +892,7 @@ function viewHome() {
       <form class="hsearch" id="hForm">${ic('search')}<input id="hq" type="search" placeholder="เรื่อง / ชื่อคน / เลขที่หนังสือ / ร 61/2569" autocomplete="off"><button class="btn sm" type="submit">ค้นหา</button></form>
       ${ADMIN ? `<div class="qa"><button data-nav="new">${ic('plus')} ลงทะเบียนหนังสือ</button><button id="qaEv">${ic('cal')} เพิ่มงาน/แจ้งเตือน</button><button id="qaAn">${ic('mega')} ส่งประกาศ</button></div>` : ''}</section>
     <div id="hAlert"></div>
+    <div id="hDue"></div>
     <div class="stats" id="hStats">${[1, 2, 3, 4].map(() => '<div class="panel stat"><div class="sk" style="width:60%"></div><div class="sk" style="height:26px;margin-top:8px;width:40%"></div></div>').join('')}</div>
     <div class="grid2">
       <section class="panel"><h2>${ic('cal')} งานที่กำลังมาถึง <button class="link" data-nav="events">ดูทั้งหมด</button></h2><div id="hEv"><div class="pb"><div class="sk"></div><div class="sk" style="margin-top:10px;width:70%"></div></div></div></section>
@@ -861,6 +915,9 @@ async function loadHome() {
     const st = (label, v, c, icon) => `<div class="panel stat"><span class="stic" style="--c:${c}">${ic(icon)}</span><div><small>${label}</small><b>${Number(v).toLocaleString()}</b></div></div>`;
     $('#hStats').innerHTML = st('หนังสือทั้งหมด', d.total, 'var(--accent)', 'file') + st('หนังสือรับ ปี ' + d.year, d.inYear, 'var(--in)', 'inbox') + st('หนังสือส่ง ปี ' + d.year, d.outYear, 'var(--out)', 'send') + `<a class="statlink" href="#" data-pending>${st('รอดำเนินการ', pend, 'var(--amber)', 'clock')}</a>`;
     $('#hEv').innerHTML = d.upcoming.length ? d.upcoming.map(upRow).join('') : `<div class="empty">${ic('cal')}ไม่มีงานใน 14 วันข้างหน้า${ADMIN ? '<br><button class="btn sm" id="hAdd" style="margin-top:10px">' + ic('plus') + ' เพิ่มงาน</button>' : ''}</div>`;
+    const dl = S.recs.filter(r => { const x = dueInfo(r); return x && !x.done && x.n <= 7; }).sort((a, b) => a.due.localeCompare(b.due));
+    $('#hDue').innerHTML = dl.length ? `<section class="panel duepanel"><h2>${ic('clock')} ใกล้ครบกำหนดส่ง / เลยกำหนด <span class="chip ${dl.some(r => dueInfo(r).n <= 0) ? 'crit' : 'warn'}">${dl.length} เรื่อง</span><button class="link" data-duelist>ดูทั้งหมด</button></h2><div id="hDueL">${dl.slice(0, 5).map((x, i) => letterRow(x, i, 'di')).join('')}</div></section>` : '';
+    if (dl.length) $('#hDueL').onclick = e => { const r = e.target.closest('[data-di]'); if (r) openLetter(dl[+r.dataset.di]); };
     $('#hRec').innerHTML = d.recent.map((x, i) => letterRow(x, i, 'ri')).join('') || '<div class="empty">ยังไม่มีหนังสือ</div>';
     $('#hEv').onclick = e => { const r = e.target.closest('[data-ui]'); if (r) openEvent(d.upcoming[+r.dataset.ui]); if (e.target.closest('#hAdd')) eventForm(); };
     $('#hRec').onclick = e => { const r = e.target.closest('[data-ri]'); if (r) openLetter(d.recent[+r.dataset.ri]); };
@@ -880,7 +937,7 @@ function viewLetters() {
     <div class="toolbar"><label class="search">${ic('search')}<input id="q" type="search" placeholder="ค้นหาหนังสือ…" autocomplete="off" value="${esc(S.q)}"><button class="xbtn" id="qx" type="button" aria-label="ล้างคำค้น" ${S.q ? '' : 'hidden'}>✕</button></label>
       <div class="ychips" id="yChips">${[''].concat(years).map(y => `<button data-y="${y}" aria-pressed="${String(S.year) === String(y)}">${y || 'ทุกปี'}</button>`).join('')}</div>
       <div class="filters"><span class="seg" id="dirSeg">${[['', 'ทั้งหมด'], ['รับ', 'รับ'], ['ส่ง', 'ส่ง']].map(([v, l]) => `<button data-d="${v}" aria-pressed="${S.dir === v}">${l}</button>`).join('')}</span>
-        <select id="stSel" aria-label="สถานะ"><option value="">ทุกสถานะ</option>${['รอดำเนินการ', 'กำลังดำเนินการ', 'ส่งต่อแล้ว', 'เสร็จสิ้น'].map(x => `<option ${S.st === x ? 'selected' : ''}>${x}</option>`).join('')}</select>
+        <select id="stSel" aria-label="สถานะ"><option value="">ทุกสถานะ</option>${['รอดำเนินการ', 'กำลังดำเนินการ', 'ส่งต่อแล้ว', 'เสร็จสิ้น'].map(x => `<option ${S.st === x ? 'selected' : ''}>${x}</option>`).join('')}<option value="__due" ${S.st === '__due' ? 'selected' : ''}>⏰ มีกำหนดส่ง (ยังไม่เสร็จ)</option></select>
         <label class="tgl"><input id="att" type="checkbox" ${S.att ? 'checked' : ''}>${ic('clip')} มีไฟล์แนบ</label></div></div>
     <p class="status" id="status"></p><div class="list" id="cards"></div>`;
   let t; const qi = $('#q');
@@ -893,24 +950,25 @@ function viewLetters() {
   $('#cards').onclick = e => { if (e.target.closest('a')) return; if (e.target.closest('#moreBtn')) { S.limit += 60; doSearch(); return; } const c = e.target.closest('[data-i]'); if (c) openLetter(S.items[+c.dataset.i]); };
   doSearch();
 }
+const gkey = x => String((S.st === '__due' ? x.due : x.date) || '').slice(0, 7);
 function doSearch() {
   const r = searchLocal(S.q, { year: S.year, dir: S.dir, att: S.att, st: S.st, limit: S.limit });
   S.items = r.items; S.total = r.total; S.mcount = {};
-  r.all.forEach(x => { const m = String(x.date || '').slice(0, 7); S.mcount[m] = (S.mcount[m] || 0) + 1; });
+  r.all.forEach(x => { const m = gkey(x); S.mcount[m] = (S.mcount[m] || 0) + 1; });
   renderLetters();
 }
 function renderLetters() {
   if (!$('#cards')) return;
-  const f = [S.year && 'ปี ' + S.year, S.dir && 'หนังสือ' + S.dir, S.st, S.att && 'มีไฟล์แนบ'].filter(Boolean).join(' · ');
+  const f = [S.year && 'ปี ' + S.year, S.dir && 'หนังสือ' + S.dir, S.st === '__due' ? 'มีกำหนดส่ง (เรียงตามวันครบกำหนด)' : S.st, S.att && 'มีไฟล์แนบ'].filter(Boolean).join(' · ');
   $('#status').innerHTML = (S.q ? `ผลค้นหา “<b>${esc(S.q)}</b>” · ` : '') + `พบ <b>${S.total.toLocaleString()}</b> เรื่อง` + (f ? ' · ' + esc(f) : '');
   if (!S.items.length) { $('#cards').innerHTML = `<div class="panel empty">${ic('search')}ไม่พบเรื่องที่ค้นหา<br>ลองเลือก “ทุกปี” หรือใช้คำที่สั้นลง</div>`; return; }
   let html = '', cur = null;
   S.items.forEach((it, i) => {
-    const m = String(it.date || '').slice(0, 7);
+    const m = gkey(it);
     if (m !== cur) {
       if (cur !== null) html += '</div>';
       const p = m.split('-').map(Number);
-      html += `<div class="lgrp"><div class="mhead">${p[0] ? TH_MF[p[1] - 1] + ' ' + (p[0] + 543) : 'ไม่ระบุวันที่'}<span>${(S.mcount[m] || 0).toLocaleString()} เรื่อง</span></div>`;
+      html += `<div class="lgrp"><div class="mhead">${S.st === '__due' ? 'กำหนดส่ง ' : ''}${p[0] ? TH_MF[p[1] - 1] + ' ' + (p[0] + 543) : 'ไม่ระบุวันที่'}<span>${(S.mcount[m] || 0).toLocaleString()} เรื่อง</span></div>`;
       cur = m;
     }
     html += letterRow(it, i);
@@ -970,6 +1028,7 @@ function viewNew() {
       <div class="f c2"><label for="nUrg">ชั้นความเร็ว</label><select id="nUrg">${opts(m.urg.length ? m.urg : ['ปกติ'])}</select></div>
       <div class="f c2"><label for="nSec">ชั้นความลับ</label><select id="nSec">${opts(m.sec.length ? m.sec : ['ปกติ'])}</select></div>
       <div class="f c6"><label for="nNote">หมายเหตุ / การสั่งการ</label><input id="nNote"></div>
+      ${opFields('n', {})}
       <h3>ที่เก็บตัวจริง (ไม่บังคับ)</h3>
       <div class="f c2 wide"><label for="nRoom">ห้อง</label><input id="nRoom"></div><div class="f"><label for="nCab">ตู้</label><input id="nCab"></div>
       <div class="f"><label for="nShelf">ชั้น</label><input id="nShelf"></div><div class="f c2 wide"><label for="nFolder">แฟ้ม</label><input id="nFolder"></div>
@@ -997,7 +1056,7 @@ function viewNew() {
     if (!v('#nSubj')) { $('#nMsg').textContent = 'กรุณากรอกเรื่อง'; $('#nSubj').focus(); return; }
     const b = $('#nSave'); b.disabled = true; b.innerHTML = '<span class="spin"></span> กำลังบันทึก…'; $('#nMsg').textContent = '';
     try {
-      const rec = await run('api_register', K, { dir: nd, date: v('#nDate'), reg: v('#nReg'), lw: v('#nLw'), book: v('#nBook'), subject: v('#nSubj'), from: v('#nFrom'), to: v('#nTo'), cat: v('#nCat'), purpose: v('#nPur'), owner: v('#nOwner'), urg: v('#nUrg'), sec: v('#nSec'), note: v('#nNote'), room: v('#nRoom'), cab: v('#nCab'), shelf: v('#nShelf'), folder: v('#nFolder') }, await readFiles(files));
+      const rec = await run('api_register', K, { dir: nd, date: v('#nDate'), reg: v('#nReg'), lw: v('#nLw'), book: v('#nBook'), subject: v('#nSubj'), from: v('#nFrom'), to: v('#nTo'), cat: v('#nCat'), purpose: v('#nPur'), owner: v('#nOwner'), urg: v('#nUrg'), sec: v('#nSec'), note: v('#nNote'), room: v('#nRoom'), cab: v('#nCab'), shelf: v('#nShelf'), folder: v('#nFolder'), ...opVals('n') }, await readFiles(files));
       window.scrollTo(0, 0);
       $('#newWrap').innerHTML = `<div class="panel done"><div class="ok">${ic('check')}</div><div class="note">ลงทะเบียนแล้ว · เขียนเลขนี้บนหนังสือ</div><div class="big">${esc(rec.label)}</div><b>${esc(rec.subject)}</b>
         <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:16px">${fileBtns(rec)}<button class="btn" id="copyLbl">${ic('copy')} คัดลอกเลข</button><button class="btn primary" id="again">${ic('plus')} ลงทะเบียนเรื่องต่อไป</button></div></div>`;
@@ -1108,7 +1167,7 @@ async function enter(key, remember, force) {
   $('#gate').hidden = true; document.querySelector('.app').hidden = false; $('#bNav').hidden = false;
   PERSIST = remember === true || (remember === undefined && store.get() === key);
   let c = PERSIST && !force ? await IDB.get('cache') : null;
-  if (c && (c.k !== key || !c.recs || !c.cols)) c = null;
+  if (c && (c.schema !== 3 || c.k !== key || !c.recs || !c.cols)) c = null;
   if (c) {                                          // มีข้อมูลในเครื่อง → แสดงทันที แล้วค่อยตรวจของใหม่
     applyBoot(c); renderNav(); go(S.q ? 'letters' : (NAV.some(n => n.id === S.view) && S.view !== 'home' ? S.view : 'home'));
     sync('กำลังตรวจข้อมูลล่าสุด…');
